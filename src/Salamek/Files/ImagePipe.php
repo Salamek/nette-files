@@ -20,8 +20,6 @@ class ImagePipe extends Nette\Object
     protected $storageDir;
     /** @var string */
     protected $blankImage;
-    /** @var string|null */
-    protected $namespace = null;
     /** @var string */
     private $wwwDir;
     /** @var string */
@@ -97,25 +95,47 @@ class ImagePipe extends Nette\Object
      * @param string $image
      * @param null $size
      * @param null $flags
-     * @param bool $strictMode
      * @return string
      * @throws \Nette\Latte\CompileException
      * @throws FileNotFoundException;
      */
-    public function request($image, $size = null, $flags = null, $strictMode = false)
+    public function request($image, $size = null, $flags = null)
     {
         $this->checkSettings();
-        if ($image instanceof ImageProvider) {
-            $this->setNamespace($image->getNamespace());
-            $image = $image->getFilename();
-        } elseif (empty($image)) {
-            return "#";
-        }
-        if ($size === null) {
-            return $this->getPath() . "/" . $this->namespace . "/" . $image;
-        }
 
+        if ($image)
+        {
+            if ($image instanceof ImageProvider) {
+                $image = $image->getFilename();
+            }
+            $originalFile = $this->assetsDir . "/" . $image;
+
+            if (is_null($size))
+            {
+                return $this->getPath() . "/" . $image;
+            }
+        }
+        elseif (empty($image) || is_null($image)) {
+            if (!$this->blankImage || !file_exists($this->blankImage))
+            {
+                return "#";
+            }
+
+            $originalFile = $this->blankImage;
+            $image = basename($this->blankImage);
+
+            if (is_null($size))
+            {
+                return $this->blankImage;
+            }
+        }
+        
         list($width, $height) = explode("x", $size);
+
+        $thumbPath = "/" . $flags . "_" . $width . "x" . $height . "/" . $image;
+        $thumbnailFile = $this->storageDir . $thumbPath;
+
+
         if ($flags == null) {
             $flags = NImage::FIT;
         } elseif (!is_int($flags)) {
@@ -141,28 +161,24 @@ class ImagePipe extends Nette\Object
             }
         }
 
-        $thumbPath = "/" . $this->namespace . $flags . "_" . $width . "x" . $height . "/" . $image;
 
-        $thumbnailFile = $this->storageDir . $thumbPath;
-        $originalFile = $this->assetsDir . "/" . $this->namespace . "/" . $image;
 
         if (!file_exists($thumbnailFile)) {
             $this->mkdir(dirname($thumbnailFile));
-            if (file_exists($originalFile)) {
-                $img = NImage::fromFile($originalFile);
-                if ($flags === "crop") {
-                    $img->crop('50%', '50%', $width, $height);
-                } else {
-                    $img->resize($width, $height, $flags);
-                }
-
-                $this->onBeforeSaveThumbnail($img, $this->namespace, $image, $width, $height, $flags);
-                $img->save($thumbnailFile);
-            } elseif ($strictMode) {
+            if (!file_exists($originalFile)) {
                 throw new FileNotFoundException;
             }
+
+            $img = NImage::fromFile($originalFile);
+            if ($flags === "crop") {
+                $img->crop('50%', '50%', $width, $height);
+            } else {
+                $img->resize($width, $height, $flags);
+            }
+
+            $this->onBeforeSaveThumbnail($img, $image, $width, $height, $flags);
+            $img->save($thumbnailFile);
         }
-        $this->namespace = null;
 
         return $this->getPath() . $thumbPath;
     }
@@ -199,21 +215,6 @@ class ImagePipe extends Nette\Object
     public function setPath($path)
     {
         $this->path = $path;
-    }
-
-    /**
-     * @param $namespace
-     * @return $this
-     */
-    public function setNamespace($namespace)
-    {
-        if (empty($namespace)) {
-            $this->namespace = null;
-        } else {
-            $this->namespace = $namespace . "/";
-        }
-
-        return $this;
     }
 
     /**

@@ -56,14 +56,11 @@ class Latte extends MacroSet
             throw new Nette\Latte\CompileException("Please provide filename.");
         }
 
-        $namespace = $arguments["namespace"];
-        unset($arguments["namespace"]);
         $arguments = array_map(function ($value) use ($writer) {
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
 
         $command = '$_imagePipe';
-        $command .= $namespace !== null ? '->setNamespace(' . $writer->formatWord(trim($namespace)) . ')' : '';
         $command .= '->request(' . implode(", ", $arguments) . ')';
 
         return $writer->write('echo %escape(' . $writer->formatWord($command) . ')');
@@ -84,14 +81,11 @@ class Latte extends MacroSet
             throw new Nette\Latte\CompileException("Please provide filename.");
         }
 
-        $namespace = $arguments["namespace"];
-        unset($arguments["namespace"]);
         $arguments = array_map(function ($value) use ($writer) {
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
 
         $command = '$_imagePipe';
-        $command .= $namespace !== null ? '->setNamespace(' . $writer->formatWord(trim($namespace)) . ')' : '';
         $command .= '->request(' . implode(", ", $arguments) . ')';
 
         return $writer->write('?> src="<?php echo %escape(' . $writer->formatWord($command) . ')?>" <?php');
