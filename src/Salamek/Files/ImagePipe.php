@@ -131,8 +131,6 @@ class ImagePipe extends Nette\Object
             }
         }
 
-        Debugger::barDump($size);
-
         list($width, $height) = explode("x", $size);
 
         $thumbPath = "/" . $flags . "_" . $width . "x" . $height . "/" . $image;
@@ -142,7 +140,7 @@ class ImagePipe extends Nette\Object
         if ($flags == null) {
             $flags = NImage::FIT;
         } elseif (!is_int($flags)) {
-            switch (strtolower($flags)):
+            switch (strtolower($flags)) {
                 case "fit":
                     $flags = NImage::FIT;
                     break;
@@ -158,9 +156,11 @@ class ImagePipe extends Nette\Object
                 case "stretch":
                     $flags = NImage::STRETCH;
                     break;
-            endswitch;
-            if (!isset($flags)) {
-                throw new Nette\Latte\CompileException('Mode is not allowed');
+                case 'crop':
+                    break;
+                default:
+                    throw new Nette\Latte\CompileException('Mode is not allowed');
+                    break;
             }
         }
 

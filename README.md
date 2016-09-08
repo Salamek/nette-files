@@ -73,4 +73,4 @@ If file not found in image storage, macro try to search file in document root. O
 
 ### Resizing flags
 
-For resizing (third argument) you can use these keywords - `fit`, `fill`, `exact`, `stretch`, `shrink_only`. For details see comments above [these constants](http://api.nette.org/2.0/source-common.Image.php.html#105)
+For resizing (third argument) you can use these keywords - `fit`, `fill`, `exact`, `stretch`, `shrink_only`, `crop`. For details see comments above [these constants](http://api.nette.org/2.0/source-common.Image.php.html#105)
