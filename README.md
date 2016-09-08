@@ -1,33 +1,31 @@
-# Images
+# Nette Files
 
-[![Join the chat at https://gitter.im/brabijan/images](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/brabijan/images?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-This is a simple image storage for [Nette Framework](http://nette.org/)
+This is a simple file storage for [Nette Framework](http://nette.org/)
 
 ## Instalation
 
-The best way to install brabijan/images is using  [Composer](http://getcomposer.org/):
+The best way to install salamek/nette-files is using  [Composer](http://getcomposer.org/):
 
 
 ```sh
-$ composer require brabijan/images:@dev
+$ composer require salamek/nette-files:@dev
 ```
 
 Then you have to register extension in `config.neon`.
 
 ```yaml
 extensions:
-	- Brabijan\Images\DI\ImagesExtension
+	- Salamek\Files\DI\FilesExtension
 ```
 
-Package contains trait, which you will have to use in class, where you want to use image storage. This works only for PHP 5.4+, for older version you can simply copy trait content and paste it into class where you want to use it.
+Package contains trait, which you will have to use in class, where you want to use file storage. This works only for PHP 5.4+, for older version you can simply copy trait content and paste it into class where you want to use it.
 
 ```php
 <?php
 
 class BasePresenter extends Nette\Application\UI\Presenter {
 
-	use Brabijan\Images\TImagePipe;
+	use Salamek\Files\TImagePipe;
 	
 }
 
@@ -35,10 +33,10 @@ class BasePresenter extends Nette\Application\UI\Presenter {
 
 ## Usage
 
-### Saving images
+### Saving files
 
 ```php
-/** @var Brabijan\Images\ImageStorage $imageStorage */
+/** @var Salamek\Files\ImageStorage $imageStorage */
 $imageStorage->upload($fileUpload); // saves to .../assetsDir/original/filename.jpg
 
 $imageStorage->setNamespace("products")->upload($fileUpload); // saves to .../assetsDir/products/original/filename.jpg
