@@ -6,7 +6,7 @@ use Brabijan\Images\ImagePipe;
 use Latte\Compiler;
 use Latte\MacroNode;
 use Latte\PhpWriter;
-use Latte\Template;
+use Latte\Runtime\Template;
 use Latte\Macros\MacroSet;
 use Nette;
 
@@ -130,10 +130,9 @@ class Latte extends MacroSet
 	}
 
 
-
 	/**
-	 * @param \Nette\Templating\Template $template
-	 * @throws \Nette\InvalidStateException
+	 * @param Template $template
+	 * @throws Nette\InvalidStateException
 	 */
 	public static function validateTemplateParams(Template $template)
 	{
