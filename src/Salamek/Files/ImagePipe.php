@@ -4,6 +4,7 @@ namespace Salamek\Files;
 
 use Nette;
 use Nette\Utils\Image as NImage;
+use Tracy\Debugger;
 
 /**
  * Class ImagePipe
@@ -129,7 +130,9 @@ class ImagePipe extends Nette\Object
                 return $this->blankImage;
             }
         }
-        
+
+        Debugger::barDump($size);
+
         list($width, $height) = explode("x", $size);
 
         $thumbPath = "/" . $flags . "_" . $width . "x" . $height . "/" . $image;
