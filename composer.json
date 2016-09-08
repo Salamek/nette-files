@@ -7,7 +7,7 @@
 	"authors": [
 		{
 			"name": "Adam Schubert"
-		},
+		}
 	],
 	"require": {
 		"latte/latte": "~2.2",
