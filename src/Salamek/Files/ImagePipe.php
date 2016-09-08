@@ -1,40 +1,33 @@
 <?php
 
-namespace Brabijan\Images;
+namespace Salamek\Files;
 
 use Nette;
 use Nette\Utils\Image as NImage;
 
 /**
- * @author Jan Brabec <brabijan@gmail.com>
+ * Class ImagePipe
+ * @package Salamek\Files
  */
 class ImagePipe extends Nette\Object
 {
 
-    /** @var string */
-    protected $assetsDir;
-
-    /** @var string */
-    protected $storageDir;
-
-    /** @var string */
-    protected $blankImage;
-
-    /** @var string */
-    private $wwwDir;
-
-    /** @var string */
-    private $path;
-
-    /** @var string */
-    private $baseUrl;
-
-    /** @var string|null */
-    protected $namespace = null;
-
     /** @var array */
     public $onBeforeSaveThumbnail = array();
-
+    /** @var string */
+    protected $assetsDir;
+    /** @var string */
+    protected $storageDir;
+    /** @var string */
+    protected $blankImage;
+    /** @var string|null */
+    protected $namespace = null;
+    /** @var string */
+    private $wwwDir;
+    /** @var string */
+    private $path;
+    /** @var string */
+    private $baseUrl;
 
     /**
      * @param $assetsDir
@@ -52,15 +45,13 @@ class ImagePipe extends Nette\Object
         $this->baseUrl = rtrim($httpRequest->url->baseUrl, '/');
     }
 
-
     /**
-     * @param $path
+     * @return string
      */
-    public function setPath($path)
+    public function getAssetsDir()
     {
-        $this->path = $path;
+        return $this->assetsDir;
     }
-
 
     /**
      * @param $dir
@@ -70,13 +61,12 @@ class ImagePipe extends Nette\Object
         $this->assetsDir = $dir;
     }
 
-
     /**
      * @return string
      */
-    public function getAssetsDir()
+    public function getStorageDir()
     {
-        return $this->assetsDir;
+        return $this->storageDir;
     }
 
     /**
@@ -90,9 +80,9 @@ class ImagePipe extends Nette\Object
     /**
      * @return string
      */
-    public function getStorageDir()
+    public function getBlankImage()
     {
-        return $this->storageDir;
+        return $this->blankImage;
     }
 
     /**
@@ -102,58 +92,6 @@ class ImagePipe extends Nette\Object
     {
         $this->blankImage = $blankImage;
     }
-
-    /**
-     * @return string
-     */
-    public function getBlankImage()
-    {
-        return $this->blankImage;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPath()
-    {
-        return $this->path !== null ? $this->path : $this->baseUrl . str_replace($this->wwwDir, '', $this->storageDir);
-    }
-
-
-    /**
-     * @throws \Nette\InvalidStateException
-     */
-    private function checkSettings()
-    {
-        if ($this->assetsDir == null) {
-            throw new Nette\InvalidStateException("Assets directory is not setted");
-        }
-        if (!file_exists($this->assetsDir)) {
-            throw new Nette\InvalidStateException("Assets directory '{$this->assetsDir}' does not exists");
-        } elseif (!is_writeable($this->assetsDir)) {
-            throw new Nette\InvalidStateException("Make assets directory '{$this->assetsDir}' writeable");
-        }
-        if ($this->getPath() == null) {
-            throw new Nette\InvalidStateException("Path is not setted");
-        }
-    }
-
-
-    /**
-     * @param $namespace
-     * @return $this
-     */
-    public function setNamespace($namespace)
-    {
-        if (empty($namespace)) {
-            $this->namespace = null;
-        } else {
-            $this->namespace = $namespace . "/";
-        }
-
-        return $this;
-    }
-
 
     /**
      * @param string $image
@@ -229,6 +167,54 @@ class ImagePipe extends Nette\Object
         return $this->getPath() . $thumbPath;
     }
 
+    /**
+     * @throws \Nette\InvalidStateException
+     */
+    private function checkSettings()
+    {
+        if ($this->assetsDir == null) {
+            throw new Nette\InvalidStateException("Assets directory is not setted");
+        }
+        if (!file_exists($this->assetsDir)) {
+            throw new Nette\InvalidStateException("Assets directory '{$this->assetsDir}' does not exists");
+        } elseif (!is_writeable($this->assetsDir)) {
+            throw new Nette\InvalidStateException("Make assets directory '{$this->assetsDir}' writeable");
+        }
+        if ($this->getPath() == null) {
+            throw new Nette\InvalidStateException("Path is not setted");
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path !== null ? $this->path : $this->baseUrl . str_replace($this->wwwDir, '', $this->storageDir);
+    }
+
+    /**
+     * @param $path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * @param $namespace
+     * @return $this
+     */
+    public function setNamespace($namespace)
+    {
+        if (empty($namespace)) {
+            $this->namespace = null;
+        } else {
+            $this->namespace = $namespace . "/";
+        }
+
+        return $this;
+    }
 
     /**
      * @param string $dir

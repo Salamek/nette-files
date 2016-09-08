@@ -1,6 +1,6 @@
 <?php
 
-namespace Brabijan\Images\DI;
+namespace Salamek\Files\DI;
 
 use Latte;
 use Nette;
@@ -19,9 +19,10 @@ if (!class_exists('Latte\Engine')) {
 }
 
 /**
- * @author Jan Brabec <brabijan@gmail.com>
+ * Class FilesExtension
+ * @package Salamek\Files\DI
  */
-class ImagesExtension extends Nette\DI\CompilerExtension
+class FilesExtension extends Nette\DI\CompilerExtension
 {
 
     public function loadConfiguration()
@@ -30,21 +31,21 @@ class ImagesExtension extends Nette\DI\CompilerExtension
         $builder = $this->getContainerBuilder();
         $engine = $builder->getDefinition('nette.latteFactory');
 
-        $install = 'Brabijan\Images\Macros\Latte::install';
+        $install = 'Salamek\Files\Macros\Latte::install';
 
         if (method_exists('Latte\Engine', 'getCompiler')) {
-            $engine->addSetup('Brabijan\Images\Macros\Latte::install(?->getCompiler())', array('@self'));
+            $engine->addSetup('Salamek\Files\Macros\Latte::install(?->getCompiler())', array('@self'));
         } else {
             $engine->addSetup($install . '(?->compiler)', array('@self'));
         }
 
         $builder->addDefinition($this->prefix('imagePipe'))
-            ->setClass('Brabijan\Images\ImagePipe', array($config['assetsDir'], $config['storageDir'], $config['blankImage'], $this->getContainerBuilder()->parameters['wwwDir']))
+            ->setClass('Salamek\Files\ImagePipe', array($config['assetsDir'], $config['storageDir'], $config['blankImage'], $this->getContainerBuilder()->parameters['wwwDir']))
             ->addSetup('setAssetsDir', array($config['assetsDir']))
             ->addSetup('getBlankImage', array($config['blankImage']))
             ->addSetup('setStorageDir', array($config['storageDir']));
-        $builder->addDefinition($this->prefix('imageStorage'))->setClass('Brabijan\Images\ImageStorage', array($config['assetsDir']));
-        $builder->addDefinition($this->prefix('fileBrowser'))->setClass('Brabijan\Images\FileBrowser');
+        $builder->addDefinition($this->prefix('imageStorage'))->setClass('Salamek\Files\ImageStorage', array($config['assetsDir']));
+        $builder->addDefinition($this->prefix('fileBrowser'))->setClass('Salamek\Files\FileBrowser');
     }
 
 
@@ -52,10 +53,10 @@ class ImagesExtension extends Nette\DI\CompilerExtension
      * @param \Nette\Config\Configurator $config
      * @param string $extensionName
      */
-    public static function register(Configurator $config, $extensionName = 'imagesExtension')
+    public static function register(Configurator $config, $extensionName = 'filesExtension')
     {
         $config->onCompile[] = function (Configurator $config, Compiler $compiler) use ($extensionName) {
-            $compiler->addExtension($extensionName, new ImagesExtension());
+            $compiler->addExtension($extensionName, new FilesExtension());
         };
     }
 

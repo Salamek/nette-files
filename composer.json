@@ -1,21 +1,14 @@
 {
-	"name": "brabijan/images",
+	"name": "salamek/nette-files",
 	"type": "library",
-	"description": "Image storage for Nette Framework",
-	"keywords": ["nette", "images"],
+	"description": "File storage for Nette Framework",
+	"keywords": ["nette", "images", "files"],
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
-			"name": "Jan Brabec"
+			"name": "Adam Schubert"
 		},
-		{
-			"name": "Filip Procházka"
-		}
 	],
-	"support": {
-		"email": "brabijan@gmail.com",
-		"issues": "https://github.com/brabijan/images/issues"
-	},
 	"require": {
 		"latte/latte": "~2.2",
         "nette/di": "~2.2",
@@ -28,7 +21,7 @@
 	},
 	"autoload": {
 		"psr-0": {
-			"Brabijan\\": "src/"
+			"Salamek\\": "src/"
 		}
 	}
 }
