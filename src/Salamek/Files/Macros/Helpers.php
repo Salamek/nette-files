@@ -22,11 +22,11 @@ class Helpers extends Nette\Object
         $size = (isset($arguments[1]) AND !empty($arguments[1])) ? $arguments[1] : null;
         $flags = (isset($arguments[2]) AND !empty($arguments[2])) ? $arguments[2] : null;
         
-        return array(
+        return [
             "name" => $name,
             "size" => $size,
             "flags" => $flags
-        );
+        ];
     }
 
 }

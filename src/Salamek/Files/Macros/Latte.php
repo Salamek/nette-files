@@ -36,7 +36,7 @@ class Latte extends MacroSet
         /**
          * {img [namespace/]$name[, $size[, $flags]]}
          */
-        $me->addMacro('img', array($me, 'macroImg'), null, array($me, 'macroAttrImg'));
+        $me->addMacro('img', [$me, 'macroImg'], null, [$me, 'macroAttrImg']);
 
         return $me;
     }
@@ -108,7 +108,7 @@ class Latte extends MacroSet
     public function finalize()
     {
         if (!$this->isUsed) {
-            return array();
+            return [];
         }
 
         return array(

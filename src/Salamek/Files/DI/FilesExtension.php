@@ -44,7 +44,8 @@ class FilesExtension extends Nette\DI\CompilerExtension
             ->addSetup('setAssetsDir', array($config['assetsDir']))
             ->addSetup('getBlankImage', array($config['blankImage']))
             ->addSetup('setStorageDir', array($config['storageDir']));
-        $builder->addDefinition($this->prefix('imageStorage'))->setClass('Salamek\Files\ImageStorage', array($config['assetsDir']));
+        
+        $builder->addDefinition($this->prefix('fileStorage'))->setClass('Salamek\Files\FileStorage', array($config['assetsDir']));
         $builder->addDefinition($this->prefix('fileBrowser'))->setClass('Salamek\Files\FileBrowser');
     }
 

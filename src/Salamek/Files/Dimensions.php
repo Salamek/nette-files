@@ -8,7 +8,7 @@ use Nette;
  * Class Size
  * @package Brabijan\Images
  */
-class Size extends Nette\Object
+class Dimensions extends Nette\Object
 {
 
     /** @var float|int */
@@ -30,13 +30,13 @@ class Size extends Nette\Object
 
     /**
      * @param string $file
-     * @return Size
+     * @return Dimensions
      */
     public static function fromFile($file)
     {
         list($width, $height) = @getimagesize($file);
 
-        return new Size($width, $height);
+        return new Dimensions($width, $height);
     }
 
     /**
