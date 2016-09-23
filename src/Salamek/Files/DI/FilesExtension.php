@@ -46,7 +46,6 @@ class FilesExtension extends Nette\DI\CompilerExtension
             ->addSetup('setStorageDir', array($config['storageDir']));
         
         $builder->addDefinition($this->prefix('fileStorage'))->setClass('Salamek\Files\FileStorage', array($config['assetsDir']));
-        $builder->addDefinition($this->prefix('fileBrowser'))->setClass('Salamek\Files\FileBrowser');
     }
 
 

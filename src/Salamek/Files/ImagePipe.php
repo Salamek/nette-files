@@ -96,6 +96,7 @@ class ImagePipe extends Pipe
             }
 
             $img = NImage::fromFile($originalFile);
+
             if ($flags === "crop") {
                 $img->crop('50%', '50%', $width, $height);
             } else {

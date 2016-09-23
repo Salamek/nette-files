@@ -5,7 +5,7 @@ namespace Salamek\Files;
 use Nette;
 use Nette\Http\FileUpload;
 use Nette\Application\Responses\FileResponse;
-
+use Nette\Utils\Image as NImage;
 
 /**
  * Class ImageStorage
@@ -239,6 +239,31 @@ class FileStorage extends Nette\Object
                 $result = copy($file, $this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
             }
 
+            //When image, check EXIF for rotation if possible
+            if($newFile->getType() == IFile::TYPE_IMAGE && in_array(strtolower($newFile->getExtension()), ['jpg', 'jpeg',' tiff']) && function_exists('exif_read_data')) {
+                $exif = @exif_read_data($this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
+                if ($exif && !empty($exif['Orientation'])) {
+                    $img = NImage::fromFile($this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
+                    switch ($exif['Orientation']) {
+                        case 8:
+                            //90
+                            $img->rotate(90, 0);
+                            break;
+                        case 3:
+                            //180
+                            $img->rotate(180, 0);
+                            break;
+                        case 6:
+                            //-90
+                            $img->rotate(-90, 0);
+                            break;
+                    }
+
+                    $img->save($this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
+                }
+            }
+
+
             if (!$result) {
                 throw new \Exception('Failed to save file');
             }
@@ -302,20 +327,20 @@ class FileStorage extends Nette\Object
     {
         foreach ($structureTree AS $k => $v) {
             if (array_key_exists('directory', $v)) {
-                $structure = $this->structureRepository->get($v['directory']);
-                $path .= '/' . $structure->name;
+                $structure = $this->structureRepository->getOneById($v['directory']);
+                $path .= '/' . $structure->getName();
             }
 
 
             if (array_key_exists('files', $v)) {
                 foreach ($v['files'] AS $fileId) {
-                    $file = $this->structureFileRepository->get($fileId);
-                    $filePath = $this->dataDir . '/' . $file->filesFiles->sum . '.' . $file->filesFiles->extension;
+                    $file = $this->structureFileRepository->getOneById($fileId);
+                    $filePath = $this->dataDir . '/' . $file->getFile()->getSum() . '.' . $file->getFile()->getExtension();
 
                     if (!is_file($filePath)) {
-                        throw new \Exception('File for pack not found');
+                        throw new \Exception(sprintf('File %s for pack not found', $filePath));
                     }
-                    $zipArchive->addFile($filePath, $path . '/' . $file->name . '.' . $file->filesFiles->extension);
+                    $zipArchive->addFile($filePath, $path . '/' . $file->getName() . '.' . $file->getFile()->getExtension());
                 }
             }
 
