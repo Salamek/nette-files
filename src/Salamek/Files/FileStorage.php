@@ -6,6 +6,12 @@ use Nette;
 use Nette\Http\FileUpload;
 use Nette\Application\Responses\FileResponse;
 use Nette\Utils\Image as NImage;
+use Salamek\Files\Models\IFile;
+use Salamek\Files\Models\IFileRepository;
+use Salamek\Files\Models\IStructure;
+use Salamek\Files\Models\IStructureFile;
+use Salamek\Files\Models\IStructureFileRepository;
+use Salamek\Files\Models\IStructureRepository;
 
 /**
  * Class ImageStorage
