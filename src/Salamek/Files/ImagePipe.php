@@ -4,6 +4,7 @@ namespace Salamek\Files;
 
 use Nette;
 use Nette\Utils\Image as NImage;
+use Salamek\Files\Models\IFile;
 
 /**
  * Class ImagePipe

@@ -6,6 +6,8 @@
 namespace Salamek\Files;
 
 
+use Salamek\Files\Models\IFile;
+
 interface IPipe
 {
     public function request(IFile $file = null);
