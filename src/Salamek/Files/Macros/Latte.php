@@ -2,14 +2,11 @@
 
 namespace Salamek\Files\Macros;
 
-use Salamek\Files\ImagePipe;
 use Latte\Compiler;
 use Latte\MacroNode;
 use Latte\PhpWriter;
-use Latte\Runtime\Template;
 use Latte\Macros\MacroSet;
 use Nette;
-use Tracy\Debugger;
 
 
 /**
@@ -20,15 +17,8 @@ class Latte extends MacroSet
 {
 
     /**
-     * @var bool
-     */
-    private $isUsed = false;
-
-
-    /**
-     * @param \Nette\Latte\Compiler $compiler
-     *
-     * @return ImgMacro|MacroSet
+     * @param Compiler $compiler
+     * @return static
      */
     public static function install(Compiler $compiler)
     {
@@ -44,14 +34,13 @@ class Latte extends MacroSet
 
 
     /**
-     * @param Nette\Latte\MacroNode $node
-     * @param Nette\Latte\PhpWriter $writer
+     * @param MacroNode $node
+     * @param PhpWriter $writer
      * @return string
      * @throws Nette\Latte\CompileException
      */
     public function macroImg(MacroNode $node, PhpWriter $writer)
     {
-        $this->isUsed = true;
         $arguments = Helpers::prepareMacroArguments($node->args);
         if ($arguments["name"] === null) {
             throw new Nette\Latte\CompileException("Please provide filename.");
@@ -60,24 +49,19 @@ class Latte extends MacroSet
         $arguments = array_map(function ($value) use ($writer) {
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
-
-        //$command = '\Tracy\Debugger::barDump($this->filters->imagePipe);';
-        /*$command = '$this->filters->imagePipe';
-        $command .= '->request(' . implode(", ", $arguments) . ')';*/
 
         return $writer->write('echo %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))');
     }
 
 
     /**
-     * @param Nette\Latte\MacroNode $node
-     * @param Nette\Latte\PhpWriter $writer
+     * @param MacroNode $node
+     * @param PhpWriter $writer
      * @return string
      * @throws Nette\Latte\CompileException
      */
     public function macroAttrImg(MacroNode $node, PhpWriter $writer)
     {
-        $this->isUsed = true;
         $arguments = Helpers::prepareMacroArguments($node->args);
         if ($arguments["name"] === null) {
             throw new Nette\Latte\CompileException("Please provide filename.");
@@ -87,51 +71,6 @@ class Latte extends MacroSet
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
 
-
-        $command = '\Tracy\Debugger::barDump($this->filters->imagePipe);';
-        //$command = '$this->filters->imagePipe';
-        //$command .= '->request(' . implode(", ", $arguments) . ')';
         return $writer->write('?> src="<?php echo  %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))?>" <?php');
-        return $writer->write('?> src="<?php echo %escape(' . $writer->formatWord($command) . ')?>" <?php');
     }
-
-
-    /**
-     */
-    public function initialize()
-    {
-        $this->isUsed = false;
-    }
-
-
-    /**
-     * Finishes template parsing.
-     *
-     * @return array(prolog, epilog)
-     */
-    public function finalize()
-    {
-        if (!$this->isUsed) {
-            return [];
-        }
-
-        return array(
-            get_called_class() . '::validateTemplateParams($template);',
-            null
-        );
-    }
-
-
-    /**
-     * @param Template $template
-     * @throws Nette\InvalidStateException
-     */
-    public static function validateTemplateParams(Template $template)
-    {
-        $params = $template->getParameter('template');
-        if (!property_exists($params->global, 'imagePipe') || !$params->global->imagePipe instanceof ImagePipe) {
-            throw new Nette\InvalidStateException('ImagePipe was not found in template filters');
-        }
-    }
-
 }

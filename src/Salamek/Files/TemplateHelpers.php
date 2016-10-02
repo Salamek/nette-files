@@ -1,11 +1,7 @@
 <?php
 
 /**
- * This file is part of the Kdyby (http://www.kdyby.org)
- *
- * Copyright (c) 2008 Filip Procházka (filip@prochazka.su)
- *
- * For the full copyright and license information, please view the file license.txt that was distributed with this source code.
+ * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
 
 namespace Salamek\Files;
@@ -17,69 +13,70 @@ use Salamek\Files\Models\IFile;
 
 
 /**
- * @author Filip Procházka <filip@prochazka.su>
+ * Class TemplateHelpers
+ * @package Salamek\Files
  */
 class TemplateHelpers extends Nette\Object
 {
 
-	/**
-	 * @var ImagePipe
-	 */
-	private $imagePipe;
+    /**
+     * @var ImagePipe
+     */
+    private $imagePipe;
+
+    /**
+     * TemplateHelpers constructor.
+     * @param ImagePipe $imagePipe
+     */
+    public function __construct(ImagePipe $imagePipe)
+    {
+        $this->imagePipe = $imagePipe;
+    }
+
+    /**
+     * @param Engine $engine
+     */
+    public function register(Engine $engine)
+    {
+        if (class_exists('Latte\Runtime\FilterInfo')) {
+            $engine->addFilter('request', [$this, 'requestFilterAware']);
+        } else {
+            $engine->addFilter('request', [$this, 'request']);
+        }
+        $engine->addFilter('getImagePipe', [$this, 'getImagePipe']);
+    }
 
 
+    /**
+     * @return ImagePipe
+     */
+    public function getImagePipe()
+    {
+        return $this->imagePipe;
+    }
 
-	public function __construct(ImagePipe $imagePipe)
-	{
-		$this->imagePipe = $imagePipe;
-	}
+    /**
+     * @param IFile|null $file
+     * @param null $size
+     * @param null $flags
+     * @return string
+     * @throws Nette\Latte\CompileException
+     */
+    public function request(IFile $file = null, $size = null, $flags = null)
+    {
+        return $this->imagePipe->request($file, $size, $flags);
+    }
 
-
-
-	public function register(Engine $engine)
-	{
-		if (class_exists('Latte\Runtime\FilterInfo')) {
-			$engine->addFilter('request', [$this, 'requestFilterAware']);
-		} else {
-			$engine->addFilter('request', [$this, 'request']);
-		}
-		$engine->addFilter('getImagePipe', [$this, 'getImagePipe']);
-	}
-
-
-
-	/**
-	 * @return ImagePipe
-	 */
-	public function getImagePipe()
-	{
-		return $this->imagePipe;
-	}
-
-
-
-	public function request(IFile $file = null, $size = null, $flags = null)
-	{
-		return $this->imagePipe->request($file, $size, $flags);
-	}
-
-
-
-	public function requestFilterAware(FilterInfo $filterInfo, IFile $file = null, $size = null, $flags = null)
-	{
-		return $this->imagePipe->request($file, $size, $flags);
-	}
-
-
-
-	/**
-	 * @deprecated
-	 */
-	public function loader($method)
-	{
-		if (method_exists($this, $method) && strtolower($method) !== 'register') {
-			return [$this, $method];
-		}
-	}
-
+    /**
+     * @param FilterInfo $filterInfo
+     * @param IFile|null $file
+     * @param null $size
+     * @param null $flags
+     * @return string
+     * @throws Nette\Latte\CompileException
+     */
+    public function requestFilterAware(FilterInfo $filterInfo, IFile $file = null, $size = null, $flags = null)
+    {
+        return $this->imagePipe->request($file, $size, $flags);
+    }
 }
