@@ -65,10 +65,7 @@ class Latte extends MacroSet
         /*$command = '$this->filters->imagePipe';
         $command .= '->request(' . implode(", ", $arguments) . ')';*/
 
-        //return $writer->write('echo %modify(call_user_func($this->filters->request, %node.word))');
         return $writer->write('echo %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))');
-
-        return $writer->write('echo %escape(' . $writer->formatWord($command) . ')');
     }
 
 
@@ -94,7 +91,7 @@ class Latte extends MacroSet
         $command = '\Tracy\Debugger::barDump($this->filters->imagePipe);';
         //$command = '$this->filters->imagePipe';
         //$command .= '->request(' . implode(", ", $arguments) . ')';
-
+        return $writer->write('?> src="<?php echo  %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))?>" <?php');
         return $writer->write('?> src="<?php echo %escape(' . $writer->formatWord($command) . ')?>" <?php');
     }
 
