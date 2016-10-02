@@ -29,21 +29,17 @@ class FilesExtension extends Nette\DI\CompilerExtension
     {
         $config = $this->getConfig();
         $builder = $this->getContainerBuilder();
-        $engine = $builder->getDefinition('nette.latteFactory');
-
-        $install = 'Salamek\Files\Macros\Latte::install';
-
-        if (method_exists('Latte\Engine', 'getCompiler')) {
-            $engine->addSetup('Salamek\Files\Macros\Latte::install(?->getCompiler())', array('@self'));
-        } else {
-            $engine->addSetup($install . '(?->compiler)', array('@self'));
-        }
 
         $builder->addDefinition($this->prefix('imagePipe'))
             ->setClass('Salamek\Files\ImagePipe', array($config['assetsDir'], $config['storageDir'], $config['blankImage'], $this->getContainerBuilder()->parameters['wwwDir']))
             ->addSetup('setAssetsDir', array($config['assetsDir']))
             ->addSetup('getBlankImage', array($config['blankImage']))
             ->addSetup('setStorageDir', array($config['storageDir']));
+
+        $builder->addDefinition($this->prefix('helpers'))
+            ->setClass('Salamek\Files\TemplateHelpers')
+            ->setFactory($this->prefix('@imagePipe') . '::createTemplateHelpers')
+            ->setInject(FALSE);
         
         $builder->addDefinition($this->prefix('fileStorage'))->setClass('Salamek\Files\FileStorage', array($config['assetsDir']));
     }
@@ -60,7 +56,6 @@ class FilesExtension extends Nette\DI\CompilerExtension
         };
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -75,4 +70,42 @@ class FilesExtension extends Nette\DI\CompilerExtension
         return parent::getConfig($defaults, $expand);
     }
 
+    public function beforeCompile()
+    {
+        $builder = $this->getContainerBuilder();
+        $registerToLatte = function (Nette\DI\ServiceDefinition $def) {
+            $def->addSetup('?->onCompile[] = function($engine) { Salamek\Files\Macros\Latte::install($engine->getCompiler()); }', ['@self']);
+
+            if (method_exists('Latte\Engine', 'addProvider')) { // Nette 2.4
+                $def->addSetup('addProvider', ['imagePipe', $this->prefix('@imagePipe')])
+                    ->addSetup('addFilter', ['request', [$this->prefix('@helpers'), 'requestFilterAware']]);
+            } else {
+                $def->addSetup('addFilter', ['getImagePipe', [$this->prefix('@helpers'), 'getImagePipe']])
+                    ->addSetup('addFilter', ['request', [$this->prefix('@helpers'), 'request']]);
+            }
+        };
+
+        $latteFactoryService = $builder->getByType('Nette\Bridges\ApplicationLatte\ILatteFactory');
+        if (!$latteFactoryService || !self::isOfType($builder->getDefinition($latteFactoryService)->getClass(), 'Latte\engine')) {
+            $latteFactoryService = 'nette.latteFactory';
+        }
+
+        if ($builder->hasDefinition($latteFactoryService) && self::isOfType($builder->getDefinition($latteFactoryService)->getClass(), 'Latte\Engine')) {
+            $registerToLatte($builder->getDefinition($latteFactoryService));
+        }
+
+        if ($builder->hasDefinition('nette.latte')) {
+            $registerToLatte($builder->getDefinition('nette.latte'));
+        }
+    }
+
+    /**
+     * @param string $class
+     * @param string $type
+     * @return bool
+     */
+    private static function isOfType($class, $type)
+    {
+        return $class === $type || is_subclass_of($class, $type);
+    }
 }

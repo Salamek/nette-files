@@ -9,6 +9,7 @@ use Latte\PhpWriter;
 use Latte\Runtime\Template;
 use Latte\Macros\MacroSet;
 use Nette;
+use Tracy\Debugger;
 
 
 /**
@@ -60,8 +61,12 @@ class Latte extends MacroSet
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
 
-        $command = '$_imagePipe';
-        $command .= '->request(' . implode(", ", $arguments) . ')';
+        //$command = '\Tracy\Debugger::barDump($this->filters->imagePipe);';
+        /*$command = '$this->filters->imagePipe';
+        $command .= '->request(' . implode(", ", $arguments) . ')';*/
+
+        //return $writer->write('echo %modify(call_user_func($this->filters->request, %node.word))');
+        return $writer->write('echo %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))');
 
         return $writer->write('echo %escape(' . $writer->formatWord($command) . ')');
     }
@@ -85,8 +90,10 @@ class Latte extends MacroSet
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
 
-        $command = '$_imagePipe';
-        $command .= '->request(' . implode(", ", $arguments) . ')';
+
+        $command = '\Tracy\Debugger::barDump($this->filters->imagePipe);';
+        //$command = '$this->filters->imagePipe';
+        //$command .= '->request(' . implode(", ", $arguments) . ')';
 
         return $writer->write('?> src="<?php echo %escape(' . $writer->formatWord($command) . ')?>" <?php');
     }
@@ -124,16 +131,9 @@ class Latte extends MacroSet
      */
     public static function validateTemplateParams(Template $template)
     {
-        $params = $template->getParameters();
-        if (!isset($params['_imagePipe']) || !$params['_imagePipe'] instanceof ImagePipe) {
-            $where = isset($params['control']) ?
-                " of component " . get_class($params['control']) . '(' . $params['control']->getName() . ')'
-                : null;
-
-            throw new Nette\InvalidStateException(
-                'Please provide an instanceof Img\\ImagePipe ' .
-                'as a parameter $_imagePipe to template' . $where
-            );
+        $params = $template->getParameter('template');
+        if (!property_exists($params->global, 'imagePipe') || !$params->global->imagePipe instanceof ImagePipe) {
+            throw new Nette\InvalidStateException('ImagePipe was not found in template filters');
         }
     }
 

@@ -15,7 +15,16 @@ class ImagePipe extends Pipe
 
     /** @var array */
     public $onBeforeSaveThumbnail = [];
-    
+
+
+    /**
+     * @return TemplateHelpers
+     */
+    public function createTemplateHelpers()
+    {
+        return new TemplateHelpers($this);
+    }
+
     /**
      * @param IFile|null $file
      * @param null $size
