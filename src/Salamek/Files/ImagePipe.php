@@ -5,6 +5,7 @@ namespace Salamek\Files;
 use Nette;
 use Nette\Utils\Image as NImage;
 use Salamek\Files\Models\IFile;
+use Salamek\Files\Models\IStructureFile;
 
 /**
  * Class ImagePipe
@@ -26,22 +27,27 @@ class ImagePipe extends Pipe
     }
 
     /**
-     * @param IFile|null $file
+     * @param IFile|IStructureFile|null $file
      * @param null $size
      * @param null $flags
      * @return string
      * @throws \Nette\Latte\CompileException
      * @throws FileNotFoundException;
      */
-    public function request(IFile $file = null, $size = null, $flags = null)
+    public function request($file = null, $size = null, $flags = null)
     {
-        if ($file->getType() != IFile::TYPE_IMAGE)
+        if ($file instanceof IStructureFile)
         {
-            throw new \InvalidArgumentException('$file is not an image');
+            $file = $file->getFile();
         }
-        
+
         if ($file)
         {
+            if ($file->getType() != IFile::TYPE_IMAGE)
+            {
+                throw new \InvalidArgumentException('$file is not an image');
+            }
+
             $originalFile = $this->assetsDir . "/" . $file->getBasename();
             $image = $file->getBasename();
             if (is_null($size))
@@ -60,7 +66,7 @@ class ImagePipe extends Pipe
 
             if (is_null($size))
             {
-                return $this->blankImage;
+                return str_replace($this->wwwDir, '',$this->blankImage);
             }
         }
 

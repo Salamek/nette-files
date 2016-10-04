@@ -16,7 +16,7 @@ abstract class Pipe extends Nette\Object implements IPipe
     /** @var string */
     protected $blankImage;
     /** @var string */
-    private $wwwDir;
+    protected $wwwDir;
     /** @var string */
     private $path;
     /** @var string */
