@@ -36,38 +36,26 @@ class ImagePipe extends Pipe
      */
     public function request($file = null, $size = null, $flags = null)
     {
-        if ($file instanceof IStructureFile)
-        {
+        if ($file instanceof IStructureFile) {
             $file = $file->getFile();
         }
 
-        if ($file)
-        {
-            if ($file->getType() != IFile::TYPE_IMAGE)
-            {
+        if ($file) {
+            if ($file->getType() != IFile::TYPE_IMAGE) {
                 throw new \InvalidArgumentException('$file is not an image');
             }
 
             $originalFile = $this->assetsDir . "/" . $file->getBasename();
             $image = $file->getBasename();
-            if (is_null($size))
-            {
+            if (is_null($size)) {
                 return $this->getPath() . "/" . $file->getBasename();
             }
-        }
-        elseif (is_null($file)) {
-            if (!$this->blankImage || !file_exists($this->blankImage))
-            {
+        } elseif (is_null($file)) {
+            if (!$this->blankImage || !file_exists($this->blankImage)) {
                 return "#";
             }
 
-            $originalFile = $this->blankImage;
-            $image = basename($this->blankImage);
-
-            if (is_null($size))
-            {
-                return str_replace($this->wwwDir, '',$this->blankImage);
-            }
+            return str_replace($this->wwwDir, '', $this->blankImage);
         }
 
         list($width, $height) = explode("x", $size);
@@ -77,24 +65,25 @@ class ImagePipe extends Pipe
 
 
         if ($flags == null) {
-            $flags = NImage::FIT;
+            $imageFlags = NImage::FIT;
         } elseif (!is_int($flags)) {
             switch (strtolower($flags)) {
                 case "fit":
-                    $flags = NImage::FIT;
+                    $imageFlags = NImage::FIT;
                     break;
                 case "fill":
-                    $flags = NImage::FILL;
+                    $imageFlags = NImage::FILL;
                     break;
                 case "exact":
-                    $flags = NImage::EXACT;
+                    $imageFlags = NImage::EXACT;
                     break;
                 case "shrink_only":
-                    $flags = NImage::SHRINK_ONLY;
+                    $imageFlags = NImage::SHRINK_ONLY;
                     break;
                 case "stretch":
-                    $flags = NImage::STRETCH;
+                    $imageFlags = NImage::STRETCH;
                     break;
+                case 'fit_exact':
                 case 'crop':
                     break;
                 default:
@@ -103,9 +92,8 @@ class ImagePipe extends Pipe
             }
         }
 
-
-
         if (!file_exists($thumbnailFile)) {
+
             $this->mkdir(dirname($thumbnailFile));
             if (!file_exists($originalFile)) {
                 throw new FileNotFoundException;
@@ -115,11 +103,20 @@ class ImagePipe extends Pipe
 
             if ($flags === "crop") {
                 $img->crop('50%', '50%', $width, $height);
+            } elseif ($flags === "fit_exact") {
+                $blank = NImage::fromBlank($width, $height, NImage::rgb(255,255,255,127));
+                $img->resize($width, $height, NImage::FIT);
+
+                $blank->place($img, '50%', '50%');
+
+                $img = $blank;
             } else {
-                $img->resize($width, $height, $flags);
+                $img->resize($width, $height, $imageFlags);
+                $img->sharpen();
             }
 
             $this->onBeforeSaveThumbnail($img, $file, $width, $height, $flags);
+
             $img->save($thumbnailFile);
         }
 

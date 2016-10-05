@@ -10,6 +10,7 @@ use Latte\Engine;
 use Latte\Runtime\FilterInfo;
 use Nette;
 use Salamek\Files\Models\IFile;
+use Salamek\Files\Models\IStructureFile;
 
 
 /**
@@ -56,26 +57,26 @@ class TemplateHelpers extends Nette\Object
     }
 
     /**
-     * @param IFile|null $file
+     * @param IFile|IStructureFile|null $file
      * @param null $size
      * @param null $flags
      * @return string
      * @throws Nette\Latte\CompileException
      */
-    public function request(IFile $file = null, $size = null, $flags = null)
+    public function request($file = null, $size = null, $flags = null)
     {
         return $this->imagePipe->request($file, $size, $flags);
     }
 
     /**
      * @param FilterInfo $filterInfo
-     * @param IFile|null $file
+     * @param IFile|IStructureFile|null $file
      * @param null $size
      * @param null $flags
      * @return string
      * @throws Nette\Latte\CompileException
      */
-    public function requestFilterAware(FilterInfo $filterInfo, IFile $file = null, $size = null, $flags = null)
+    public function requestFilterAware(FilterInfo $filterInfo, $file = null, $size = null, $flags = null)
     {
         return $this->imagePipe->request($file, $size, $flags);
     }
