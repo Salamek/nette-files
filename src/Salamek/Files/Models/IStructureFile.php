@@ -27,4 +27,9 @@ interface IStructureFile
      * @return IStructure
      */
     public function getStructure();
+
+    /**
+     * @return mixed
+     */
+    public function getBasename();
 }

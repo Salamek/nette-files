@@ -41,7 +41,7 @@ class FilesExtension extends Nette\DI\CompilerExtension
             ->setFactory($this->prefix('@imagePipe') . '::createTemplateHelpers')
             ->setInject(FALSE);
         
-        $builder->addDefinition($this->prefix('fileStorage'))->setClass('Salamek\Files\FileStorage', array($config['assetsDir']));
+        $builder->addDefinition($this->prefix('fileStorage'))->setClass('Salamek\Files\FileStorage', array($config['assetsDir'], $config['iconDir']));
     }
 
 
@@ -78,10 +78,12 @@ class FilesExtension extends Nette\DI\CompilerExtension
 
             if (method_exists('Latte\Engine', 'addProvider')) { // Nette 2.4
                 $def->addSetup('addProvider', ['imagePipe', $this->prefix('@imagePipe')])
-                    ->addSetup('addFilter', ['request', [$this->prefix('@helpers'), 'requestFilterAware']]);
+                    ->addSetup('addFilter', ['request', [$this->prefix('@helpers'), 'requestFilterAware']])
+                    ->addSetup('addFilter', ['fileIcon', [$this->prefix('@fileStorage')]]);
             } else {
                 $def->addSetup('addFilter', ['getImagePipe', [$this->prefix('@helpers'), 'getImagePipe']])
-                    ->addSetup('addFilter', ['request', [$this->prefix('@helpers'), 'request']]);
+                    ->addSetup('addFilter', ['request', [$this->prefix('@helpers'), 'request']])
+                    ->addSetup('addFilter', ['fileIcon', [$this->prefix('@fileStorage')]]);
             }
         };
 

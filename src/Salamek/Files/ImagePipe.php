@@ -48,7 +48,7 @@ class ImagePipe extends Pipe
             $originalFile = $this->assetsDir . "/" . $file->getBasename();
             $image = $file->getBasename();
             if (is_null($size)) {
-                return $this->getPath() . "/" . $file->getBasename();
+                return str_replace($this->wwwDir, '', $this->getAssetsDir()). "/" . $file->getBasename();
             }
         } elseif (is_null($file)) {
             if (!$this->blankImage || !file_exists($this->blankImage)) {

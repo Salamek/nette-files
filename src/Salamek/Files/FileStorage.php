@@ -20,8 +20,14 @@ use Salamek\Files\Models\IStructureRepository;
 class FileStorage extends Nette\Object
 {
 
+    const ICON = 'ico';
+    const ICON_DARK = 'ico_dark';
+
     /** @var string */
     private $dataDir;
+
+    /** @var string */
+    private $iconDir;
 
     /** @var IStructureRepository */
     private $structureRepository;
@@ -38,18 +44,85 @@ class FileStorage extends Nette\Object
     private $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
     private $textExtensions = ['txt', 'css', 'csv', 'html', 'log', 'sql', 'xhtml', 'xml'];
     private $mediaExtensions = ['ac3', 'avi', 'fla', 'flv', 'm4a', 'mid', 'mov', 'mp3', 'mp4', 'mpeg', 'mpg', 'ogg', 'wav', 'webm', 'wma'];
-    
+
+    private $iconsSupported = [
+        'ac3',
+        'accdb',
+        'ade',
+        'adp',
+        'ai',
+        'aiff',
+        'avi',
+        'bmp',
+        'css',
+        'csv',
+        'dmg',
+        'doc',
+        'docx',
+        'fla',
+        'flv',
+        'gif',
+        'gz',
+        'html',
+        'iso',
+        'jpeg',
+        'jpg',
+        'log',
+        'm4a',
+        'mdb',
+        'mid',
+        'mov',
+        'mp3',
+        'mp4',
+        'mpeg',
+        'mpg',
+        'odb',
+        'odf',
+        'odg',
+        'odp',
+        'ods',
+        'odt',
+        'ogg',
+        'otg',
+        'otp',
+        'ots',
+        'ott',
+        'pdf',
+        'png',
+        'ppt',
+        'pptx',
+        'psd',
+        'rar',
+        'rtf',
+        'sql',
+        'svg',
+        'tar',
+        'tiff',
+        'txt',
+        'wav',
+        'webm',
+        'wma',
+        'xhtml',
+        'xls',
+        'xlsx',
+        'xml',
+        'zip',
+        'folder',
+        'folder_back'
+    ];
 
     /**
      * FileStorage constructor.
      * @param $dir
+     * @param $iconDir
      * @param IStructureRepository $structureRepository
      * @param IFileRepository $fileRepository
      * @param IStructureFileRepository $structureFileRepository
      */
-    public function __construct($dir, IStructureRepository $structureRepository, IFileRepository $fileRepository, IStructureFileRepository $structureFileRepository)
+    public function __construct($dir, $iconDir, IStructureRepository $structureRepository, IFileRepository $fileRepository, IStructureFileRepository $structureFileRepository)
     {
         $this->setDataDir($dir);
+        $this->setIconDir($iconDir);
         $this->structureRepository = $structureRepository;
         $this->fileRepository = $fileRepository;
         $this->structureFileRepository = $structureFileRepository;
@@ -66,6 +139,18 @@ class FileStorage extends Nette\Object
             mkdir($dir, 0777);
         }
         $this->dataDir = $dir;
+    }
+
+    /**
+     * @param $iconDir
+     */
+    public function setIconDir($iconDir)
+    {
+        if (!is_dir($iconDir)) {
+            umask(0);
+            mkdir($iconDir, 0777);
+        }
+        $this->iconDir = $iconDir;
     }
 
 
@@ -363,7 +448,7 @@ class FileStorage extends Nette\Object
     public function downloadFile(IStructureFile $structureFile)
     {
         $path = $this->dataDir . '/' . $structureFile->getFile()->getBasename();
-        return new FileResponse($path, $structureFile->getName() . '.' . $structureFile->getFile()->getExtension(), $structureFile->getFile()->getMimeType());
+        return new FileResponse($path, $structureFile->getBasename(), $structureFile->getFile()->getMimeType());
     }
 
     /**
@@ -417,6 +502,32 @@ class FileStorage extends Nette\Object
         return $this->dataDir;
     }
 
+    /**
+     * @param IFile $file
+     * @return string
+     */
+    public function getFileSystemPath(IFile $file)
+    {
+        return $this->getDataDir().'/'.$file->getBasename();
+    }
+
+    /**
+     * @param IFile $file
+     * @param string $type
+     * @return string
+     */
+    public function getIcon(IFile $file, $type = self::ICON)
+    {
+        $extension = $file->getExtension();
+        if (in_array($extension, $this->iconsSupported))
+        {
+            return $this->iconDir.'/'.$type.'/'.$extension.'.jpg';
+        }
+        else
+        {
+            return $this->iconDir.'/'.$type.'/txt.jpg';
+        }
+    }
 }
 
 
