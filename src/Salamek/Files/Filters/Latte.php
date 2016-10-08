@@ -11,7 +11,7 @@ use Salamek\Files\Models\IFile;
 /**
  * Class Icon
  */
-class Icon
+class Latte
 {
     private $fileStorage;
 

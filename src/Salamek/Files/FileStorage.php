@@ -29,6 +29,9 @@ class FileStorage extends Nette\Object
     /** @var string */
     private $iconDir;
 
+    /** @var string */
+    private $wwwDir;
+
     /** @var IStructureRepository */
     private $structureRepository;
 
@@ -115,14 +118,16 @@ class FileStorage extends Nette\Object
      * FileStorage constructor.
      * @param $dir
      * @param $iconDir
+     * @param $wwwDir
      * @param IStructureRepository $structureRepository
      * @param IFileRepository $fileRepository
      * @param IStructureFileRepository $structureFileRepository
      */
-    public function __construct($dir, $iconDir, IStructureRepository $structureRepository, IFileRepository $fileRepository, IStructureFileRepository $structureFileRepository)
+    public function __construct($dir, $iconDir, $wwwDir, IStructureRepository $structureRepository, IFileRepository $fileRepository, IStructureFileRepository $structureFileRepository)
     {
         $this->setDataDir($dir);
         $this->setIconDir($iconDir);
+        $this->wwwDir = $wwwDir;
         $this->structureRepository = $structureRepository;
         $this->fileRepository = $fileRepository;
         $this->structureFileRepository = $structureFileRepository;
@@ -521,12 +526,14 @@ class FileStorage extends Nette\Object
         $extension = $file->getExtension();
         if (in_array($extension, $this->iconsSupported))
         {
-            return $this->iconDir.'/'.$type.'/'.$extension.'.jpg';
+            $fileSystemPath = $this->iconDir.'/'.$type.'/'.$extension.'.jpg';
         }
         else
         {
-            return $this->iconDir.'/'.$type.'/txt.jpg';
+            $fileSystemPath = $this->iconDir.'/'.$type.'/txt.jpg';
         }
+
+        return str_replace($this->wwwDir, '', $fileSystemPath);
     }
 }
 
