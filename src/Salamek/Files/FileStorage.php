@@ -158,6 +158,13 @@ class FileStorage extends Nette\Object
         $this->iconDir = $iconDir;
     }
 
+    /**
+     * @return string
+     */
+    public function getIconDir()
+    {
+        return $this->iconDir;
+    }
 
     /**
      * @param $filePath
