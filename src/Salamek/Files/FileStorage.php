@@ -167,6 +167,14 @@ class FileStorage extends Nette\Object
     }
 
     /**
+     * @return mixed
+     */
+    public function getIconDirWww()
+    {
+        return str_replace($this->wwwDir, '', $this->getIconDir());
+    }
+
+    /**
      * @param $filePath
      * @param $type
      * @return bool
