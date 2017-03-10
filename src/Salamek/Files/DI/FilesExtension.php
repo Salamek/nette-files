@@ -35,8 +35,8 @@ class FilesExtension extends Nette\DI\CompilerExtension
         $builder = $this->getContainerBuilder();
 
         $builder->addDefinition($this->prefix('imagePipe'))
-            ->setClass('Salamek\Files\ImagePipe', array($config['assetsDir'], $config['storageDir'], $config['blankImage'], $this->getContainerBuilder()->parameters['wwwDir']))
-            ->addSetup('setAssetsDir', array($config['assetsDir']))
+            ->setClass('Salamek\Files\ImagePipe', array($config['dataDir'], $config['storageDir'], $config['blankImage'], $this->getContainerBuilder()->parameters['wwwDir']))
+            ->addSetup('setDataDir', array($config['dataDir']))
             ->addSetup('getBlankImage', array($config['blankImage']))
             ->addSetup('setStorageDir', array($config['storageDir']));
 
@@ -45,7 +45,7 @@ class FilesExtension extends Nette\DI\CompilerExtension
             ->setFactory($this->prefix('@imagePipe') . '::createTemplateHelpers')
             ->setInject(FALSE);
         
-        $builder->addDefinition($this->prefix('fileStorage'))->setClass('Salamek\Files\FileStorage', array($config['assetsDir'], $config['iconDir'], $this->getContainerBuilder()->parameters['wwwDir']));
+        $builder->addDefinition($this->prefix('fileStorage'))->setClass('Salamek\Files\FileStorage', array($config['dataDir'], $config['iconDir'], $this->getContainerBuilder()->parameters['wwwDir']));
         
         $builder->addDefinition($this->prefix('fileFiltersLatte'))->setClass('Salamek\Files\Filters\Latte', []);
     }
@@ -69,7 +69,7 @@ class FilesExtension extends Nette\DI\CompilerExtension
     {
         $defaults = array(
             'storageDir' => $this->getContainerBuilder()->parameters['wwwDir'] . '/assets',
-            'assetsDir' => $this->getContainerBuilder()->parameters['wwwDir'] . '/assets',
+            'dataDir' => $this->getContainerBuilder()->parameters['wwwDir'] . '/assets',
             'blankImage' => $this->getContainerBuilder()->parameters['wwwDir'] . '/assets/blank.png'
         );
 

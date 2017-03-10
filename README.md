@@ -1,6 +1,9 @@
 # Nette Files
 
-This is a simple file storage for [Nette Framework](http://nette.org/)
+This is a file storage for [Nette Framework](http://nette.org/)
+
+Nette Files implements virtual directory structure (`IStructure`, `IStructureRepositry`) all files are stored in `dataDir` as their md5sum.ext, file info is implemented in `IStructureFile`, `IStructureFileRepository` and position of file in structure is implemented in `IFile` and `IFileRepository`
+
 
 ## Instalation
 
@@ -14,9 +17,23 @@ $ composer require salamek/nette-files:@dev
 Then you have to register extension in `config.neon`.
 
 ```yaml
-extensions:
-	- Salamek\Files\DI\FilesExtension
+    extensions:
+        files: Salamek\Files\DI\FilesExtension
+
+    files:
+        dataDir: %wwwDir%/data
+        storageDir: %wwwDir%/webtemp
+        iconDir: %wwwDir%/assets/file
+        blankImage: %wwwDir%/assets/file/ico/zip.jpg
 ```
+
+You will need to implement:
+* IFile entity representing single file
+* IFileRepository repository for IFile
+* IStructure entity representing single structure item (Folder/Directory)
+* IStructureRepositry repository for IStructure
+* IStructureFile entity representing connection of IFile to IStructure (in what folder is what file)
+* IStructureFileRepository repository for IStructureFile
 
 Package contains trait, which you will have to use in class, where you want to use file storage. This works only for PHP 5.4+, for older version you can simply copy trait content and paste it into class where you want to use it.
 
@@ -25,8 +42,8 @@ Package contains trait, which you will have to use in class, where you want to u
 
 class BasePresenter extends Nette\Application\UI\Presenter {
 
-	use Salamek\Files\TImagePipe;
-	
+    use Salamek\Files\TImagePipe;
+
 }
 
 ```
@@ -36,41 +53,24 @@ class BasePresenter extends Nette\Application\UI\Presenter {
 ### Saving files
 
 ```php
-/** @var Salamek\Files\ImageStorage $imageStorage */
-$imageStorage->upload($fileUpload); // saves to .../assetsDir/original/filename.jpg
+/** @var Salamek\Files\FileStorage $fileStorage */
+/** @var \SplFileInfo|FileUpload $fileUpload */
+$fileStorage->processFile($fileUpload); // Saves file to `dataDir` as %wwwDir%/data/md5sum_of_file.ext
 
-$imageStorage->setNamespace("products")->upload($fileUpload); // saves to .../assetsDir/products/original/filename.jpg
 ```
 
-### Using in Latte
+### Using ImagePipe in Latte
 
 ```html
-<a href="{img products/filename.jpg}"><img n:img="filename.jpg, 200x200, fill"></a>
+<a href="{img IFile|IStructureFile}"><img n:img="IFile|IStructureFile, 200x200, fill"></a>
 ```
 
 output:
 
 ```html
-<a href="/assetsDir/products/original/filename.jpg"><img src="/assetsDir/200x200_4/filename.jpg"></a>
+<a href="%wwwDir%/data/md5sum_of_file.ext"><img src="%wwwDir%/data/200x200_fill_md5sum_of_file.ext"></a>
 ```
 
-### Using in [Texy!](http://texy.info/)
-
-First you have to register macro into Texy!
-
-```php
-$texy = new Texy;
-$this->registerTexyMacros($texy);
-```
-
-Now you can just use it. Macro expands native image macro in Texy. Here is the syntax.
-
-```html
-[* products/filename.jpg, 200x200, fill *]
-```
-
-If file not found in image storage, macro try to search file in document root. Of course you can add title or floating of image, as you know from pure Texy!
-
-### Resizing flags
+### Resizing ImagePipe flags
 
 For resizing (third argument) you can use these keywords - `fit`, `fill`, `exact`, `stretch`, `shrink_only`, `crop`. For details see comments above [these constants](http://api.nette.org/2.0/source-common.Image.php.html#105)

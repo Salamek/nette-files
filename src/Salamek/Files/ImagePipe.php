@@ -48,10 +48,10 @@ class ImagePipe extends Pipe
                 throw new \InvalidArgumentException('$file is not an image');
             }
 
-            $originalFile = $this->assetsDir . "/" . $file->getBasename();
+            $originalFile = $this->dataDir . "/" . $file->getBasename();
             $image = $file->getBasename();
             if (is_null($size)) {
-                return str_replace($this->wwwDir, '', $this->getAssetsDir()). "/" . $file->getBasename();
+                return str_replace($this->wwwDir, '', $this->getDataDir()). "/" . $file->getBasename();
             }
         } elseif (is_null($file)) {
             if (!$this->blankImage || !file_exists($this->blankImage)) {

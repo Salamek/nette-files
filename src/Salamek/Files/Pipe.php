@@ -14,7 +14,7 @@ use Nette;
 abstract class Pipe extends Nette\Object implements IPipe
 {
     /** @var string */
-    protected $assetsDir;
+    protected $dataDir;
     /** @var string */
     protected $storageDir;
     /** @var string */
@@ -27,16 +27,16 @@ abstract class Pipe extends Nette\Object implements IPipe
     private $baseUrl;
 
     /**
-     * @param $assetsDir
+     * @param $dataDir
      * @param $storageDir
      * @param $blankImage
      * @param $wwwDir
      * @param Nette\Http\Request $httpRequest
      */
-    public function __construct($assetsDir, $storageDir, $blankImage, $wwwDir, Nette\Http\Request $httpRequest)
+    public function __construct($dataDir, $storageDir, $blankImage, $wwwDir, Nette\Http\Request $httpRequest)
     {
         $this->wwwDir = $wwwDir;
-        $this->assetsDir = $assetsDir;
+        $this->dataDir = $dataDir;
         $this->storageDir = $storageDir;
         $this->blankImage = $blankImage;
         $this->baseUrl = rtrim($httpRequest->url->baseUrl, '/');
@@ -47,17 +47,17 @@ abstract class Pipe extends Nette\Object implements IPipe
     /**
      * @return string
      */
-    public function getAssetsDir()
+    public function getDataDir()
     {
-        return $this->assetsDir;
+        return $this->dataDir;
     }
 
     /**
      * @param $dir
      */
-    public function setAssetsDir($dir)
+    public function setDataDir($dir)
     {
-        $this->assetsDir = $dir;
+        $this->dataDir = $dir;
     }
 
     /**
@@ -97,13 +97,13 @@ abstract class Pipe extends Nette\Object implements IPipe
      */
     private function checkSettings()
     {
-        if ($this->assetsDir == null) {
+        if ($this->dataDir == null) {
             throw new Nette\InvalidStateException("Assets directory is not setted");
         }
-        if (!file_exists($this->assetsDir)) {
-            throw new Nette\InvalidStateException("Assets directory '{$this->assetsDir}' does not exists");
-        } elseif (!is_writeable($this->assetsDir)) {
-            throw new Nette\InvalidStateException("Make assets directory '{$this->assetsDir}' writeable");
+        if (!file_exists($this->dataDir)) {
+            throw new Nette\InvalidStateException("Assets directory '{$this->dataDir}' does not exists");
+        } elseif (!is_writeable($this->dataDir)) {
+            throw new Nette\InvalidStateException("Make assets directory '{$this->dataDir}' writeable");
         }
         if ($this->getPath() == null) {
             throw new Nette\InvalidStateException("Path is not setted");
