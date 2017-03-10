@@ -5,7 +5,10 @@
 
 namespace Salamek\Files\Models;
 
-
+/**
+ * Interface IFileRepository
+ * @package Salamek\Files\Models
+ */
 interface IFileRepository
 {
     /**

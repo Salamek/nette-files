@@ -5,36 +5,39 @@
 
 namespace Salamek\Files\Models;
 
-
+/**
+ * Interface IFile
+ * @package Salamek\Files\Models
+ */
 interface IFile
 {
     const TYPE_IMAGE = 'image';
     const TYPE_TEXT = 'text';
     const TYPE_MEDIA = 'media';
     const TYPE_BINARY = 'binary';
-    
+
     /**
-     * @return string
+     * @param $sum
      */
     public function setSum($sum);
 
     /**
-     * @return int
+     * @param $size
      */
     public function setSize($size);
 
     /**
-     * @return string
+     * @param $extension
      */
     public function setExtension($extension);
 
     /**
-     * @return string
+     * @param $mimeType
      */
     public function setMimeType($mimeType);
 
     /**
-     * @return string
+     * @param string $type
      */
     public function setType($type = self::TYPE_BINARY);
 

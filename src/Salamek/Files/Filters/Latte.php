@@ -13,6 +13,7 @@ use Salamek\Files\Models\IFile;
  */
 class Latte
 {
+    /** @var FileStorage */
     private $fileStorage;
 
     /**

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
+ */
 namespace Salamek\Files;
 
 use Nette;
@@ -503,12 +506,18 @@ class FileStorage extends Nette\Object
     {
         $this->fileRepository->deleteFile($file);
     }
-    
+
+    /**
+     * @param IStructureFile $IStructureFile
+     */
     public function deleteStructureFile(IStructureFile $IStructureFile)
     {
         $this->structureFileRepository->deleteStructureFile($IStructureFile);
     }
 
+    /**
+     * @param IStructure $structure
+     */
     public function deleteStructure(IStructure $structure)
     {
         $this->structureRepository->deleteStructure($structure);

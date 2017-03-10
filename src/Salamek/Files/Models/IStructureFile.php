@@ -5,7 +5,10 @@
 
 namespace Salamek\Files\Models;
 
-
+/**
+ * Interface IStructureFile
+ * @package Salamek\Files\Models
+ */
 interface IStructureFile
 {
     /**

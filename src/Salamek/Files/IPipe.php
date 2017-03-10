@@ -5,7 +5,15 @@
 
 namespace Salamek\Files;
 
+/**
+ * Interface IPipe
+ * @package Salamek\Files
+ */
 interface IPipe
 {
+    /**
+     * @param null $file
+     * @return mixed
+     */
     public function request($file = null);
 }

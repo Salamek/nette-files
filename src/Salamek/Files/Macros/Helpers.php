@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
+ */
 namespace Salamek\Files\Macros;
 
 use Nette;
@@ -11,6 +14,10 @@ use Nette;
 class Helpers extends Nette\Object
 {
 
+    /**
+     * @param $macro
+     * @return array
+     */
     public static function prepareMacroArguments($macro)
     {
         $arguments = array_map(function ($value) {

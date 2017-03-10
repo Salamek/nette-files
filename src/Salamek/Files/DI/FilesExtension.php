@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
+ */
 namespace Salamek\Files\DI;
 
 use Latte;
@@ -25,6 +28,7 @@ if (!class_exists('Latte\Engine')) {
 class FilesExtension extends Nette\DI\CompilerExtension
 {
 
+    
     public function loadConfiguration()
     {
         $config = $this->getConfig();

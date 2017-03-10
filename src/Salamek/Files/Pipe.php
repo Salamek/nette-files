@@ -7,6 +7,10 @@ namespace Salamek\Files;
 
 use Nette;
 
+/**
+ * Class Pipe
+ * @package Salamek\Files
+ */
 abstract class Pipe extends Nette\Object implements IPipe
 {
     /** @var string */

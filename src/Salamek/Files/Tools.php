@@ -5,7 +5,10 @@
 
 namespace Salamek\Files;
 
-
+/**
+ * Class Tools
+ * @package Salamek\Files
+ */
 class Tools
 {
     /**

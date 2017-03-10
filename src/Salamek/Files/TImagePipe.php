@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
+ */
 namespace Salamek\Files;
 
 use Nette;
@@ -37,11 +40,4 @@ trait TImagePipe
 
         return $template;
     }
-
-
-    protected function registerTexyMacros(\Texy $texy)
-    {
-        Macros\Texy::register($texy, $this->imgPipe);
-    }
-
 }
