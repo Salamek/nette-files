@@ -98,6 +98,7 @@ class ImagePipe extends Pipe
         if (!file_exists($thumbnailFile)) {
 
             $this->mkdir(dirname($thumbnailFile));
+
             if (!file_exists($originalFile)) {
                 throw new FileNotFoundException;
             }

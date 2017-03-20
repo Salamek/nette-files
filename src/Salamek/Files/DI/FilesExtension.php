@@ -10,7 +10,6 @@ use Nette;
 use Nette\DI\Compiler;
 use Nette\DI\Configurator;
 
-
 if (!class_exists('Nette\DI\CompilerExtension')) {
     class_alias('Nette\Config\CompilerExtension', 'Nette\DI\CompilerExtension');
     class_alias('Nette\Config\Compiler', 'Nette\DI\Compiler');
@@ -37,7 +36,7 @@ class FilesExtension extends Nette\DI\CompilerExtension
         $builder->addDefinition($this->prefix('imagePipe'))
             ->setClass('Salamek\Files\ImagePipe', array($config['dataDir'], $config['storageDir'], $config['blankImage'], $this->getContainerBuilder()->parameters['wwwDir']))
             ->addSetup('setDataDir', array($config['dataDir']))
-            ->addSetup('getBlankImage', array($config['blankImage']))
+            ->addSetup('setBlankImage', array($config['blankImage']))
             ->addSetup('setStorageDir', array($config['storageDir']));
 
         $builder->addDefinition($this->prefix('helpers'))
