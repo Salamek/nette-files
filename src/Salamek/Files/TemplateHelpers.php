@@ -17,8 +17,9 @@ use Salamek\Files\Models\IStructureFile;
  * Class TemplateHelpers
  * @package Salamek\Files
  */
-class TemplateHelpers extends Nette\Object
+class TemplateHelpers
 {
+    use Nette\SmartObject;
 
     /**
      * @var ImagePipe

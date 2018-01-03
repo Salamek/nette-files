@@ -11,8 +11,9 @@ use Nette;
  * Class Helpers
  * @package Salamek\Files\Macros
  */
-class Helpers extends Nette\Object
+class Helpers
 {
+    use Nette\SmartObject;
 
     /**
      * @param $macro

@@ -20,8 +20,9 @@ use Salamek\Files\Models\IStructureRepository;
  * Class ImageStorage
  * @package Salamek\Files
  */
-class FileStorage extends Nette\Object
+class FileStorage
 {
+    use Nette\SmartObject;
 
     const ICON = 'ico';
     const ICON_DARK = 'ico_dark';
