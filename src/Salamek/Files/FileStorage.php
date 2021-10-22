@@ -475,7 +475,7 @@ class FileStorage
         $zipArchive = new \ZipArchive();
         $tmpfname = tempnam(sys_get_temp_dir(), 'structure-download');
 
-        if (!$zipArchive->open($tmpfname, \ZipArchive::CREATE)) {
+        if (!$zipArchive->open($tmpfname, \ZipArchive::OVERWRITE)) {
             throw new \Exception('Failed to create ZIP archive');
         }
 
