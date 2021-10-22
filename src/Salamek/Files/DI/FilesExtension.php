@@ -31,7 +31,7 @@ class FilesExtension extends CompilerExtension
 
     public function loadConfiguration()
     {
-        $config = $this->getConfig();
+        $config = (array) $this->getConfig();
         $builder = $this->getContainerBuilder();
 
         $builder->addDefinition($this->prefix('imagePipe'))
