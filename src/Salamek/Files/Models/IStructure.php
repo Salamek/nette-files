@@ -18,9 +18,9 @@ interface IStructure
 
     /**
      * @param IStructure|null $parent
-     * @return $this
+     * @return void
      */
-    public function setParent(IStructure $parent = null): IStructure;
+    public function setParent(IStructure $parent = null): void;
 
     /**
      * @return string
