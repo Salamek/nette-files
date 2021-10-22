@@ -22,7 +22,8 @@ Then you have to register extension in `config.neon`.
 
     files:
         dataDir: %wwwDir%/data
-        wwwTempDir: %wwwDir%/webtemp
+        webTempDir: %wwwDir%/webtemp
+        webTempPath: 'webtemp'
         iconDir: %wwwDir%/assets/file
 ```
 

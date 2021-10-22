@@ -23,7 +23,10 @@ abstract class Pipe implements IPipe
     protected $dataDir;
 
     /** @var string */
-    protected $storageDir;
+    protected $webTempDir;
+
+    /** @var string */
+    protected $webTempPath;
 
     /** @var string */
     private $path;
@@ -34,13 +37,14 @@ abstract class Pipe implements IPipe
     /**
      * Pipe constructor.
      * @param $dataDir
-     * @param $storageDir
+     * @param $webTempDir
      * @param Request $httpRequest
      */
-    public function __construct(string $dataDir, string $storageDir, Request $httpRequest)
+    public function __construct(string $dataDir, string $webTempDir, string $webTempPath, Request $httpRequest)
     {
         $this->dataDir = $dataDir;
-        $this->storageDir = $storageDir;
+        $this->webTempDir = $webTempDir;
+        $this->webTempPath = $webTempPath;
         $this->baseUrl = rtrim($httpRequest->url->baseUrl, '/');
 
         $this->checkSettings();
@@ -65,17 +69,9 @@ abstract class Pipe implements IPipe
     /**
      * @return string
      */
-    public function getStorageDir(): string
+    public function getWebTempDir(): string
     {
-        return $this->storageDir;
-    }
-
-    /**
-     * @param string $storageDir
-     */
-    public function setStorageDir(string $storageDir): void
-    {
-        $this->storageDir = $storageDir;
+        return $this->webTempDir;
     }
 
     /**
@@ -101,7 +97,7 @@ abstract class Pipe implements IPipe
      */
     public function getPath(): string
     {
-        return $this->path !== null ? $this->path : $this->baseUrl . $this->storageDir;
+        return $this->path !== null ? $this->path : $this->baseUrl . $this->webTempPath;
     }
 
     /**

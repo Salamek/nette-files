@@ -126,9 +126,11 @@ class ImagePipe extends Pipe
     public function request(IFile $file = null, string $size = null, string $flags = null): string
     {
         if (is_null($size)){
-            [$width, $height,] = ['', ''];
+            [$width, $height,] = [null, null];
         } else {
-            [$width, $height] = explode('x', $size);
+            $parts = explode('x', $size);
+            $width = intval($parts[0]);
+            $height = intval($parts[1]);
         }
 
         if ($file) {
@@ -138,7 +140,7 @@ class ImagePipe extends Pipe
 
             $originalFile = $this->dataDir . '/' . $file->getBasename();
             $generator = function () use ($originalFile, $width, $height, $flags): Image {
-              return $this->resizeImage($originalFile, $width, $height, $flags);
+                return $this->resizeImage($originalFile, $width, $height, $flags);
             };
             $image = $file->getBasename();
         } else {

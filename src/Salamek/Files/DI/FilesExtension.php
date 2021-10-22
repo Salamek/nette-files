@@ -25,7 +25,8 @@ class FilesExtension extends CompilerExtension
         return Expect::structure([
             'dataDir' => Expect::string()->required(),
             'webTempDir' => Expect::string()->required(),
-            'iconDir' => Expect::string()->required(),
+            'webTempPath' => Expect::string()->required(),
+            'iconDir' => Expect::string()->required()
         ]);
     }
 
@@ -35,7 +36,7 @@ class FilesExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         $builder->addDefinition($this->prefix('imagePipe'))
-            ->setFactory(ImagePipe::class, [$config['dataDir'], $config['webTempDir']]);
+            ->setFactory(ImagePipe::class, [$config['dataDir'], $config['webTempDir'], $config['webTempPath']]);
 
         $builder->addDefinition($this->prefix('fileStorage'))
             ->setFactory(FileStorage::class, [$config['dataDir'], $config['iconDir']]);
