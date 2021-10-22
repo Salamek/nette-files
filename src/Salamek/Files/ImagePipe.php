@@ -155,7 +155,7 @@ class ImagePipe extends Pipe
         }
 
         $thumbPath = '/' . $flags . '_' . $width . 'x' . $height . '/' . $image;
-        $thumbnailFile = $this->storageDir . $thumbPath;
+        $thumbnailFile = $this->webTempDir . $thumbPath;
 
         if (!file_exists($thumbnailFile)) {
 

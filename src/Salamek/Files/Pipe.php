@@ -97,7 +97,7 @@ abstract class Pipe implements IPipe
      */
     public function getPath(): string
     {
-        return $this->path !== null ? $this->path : $this->baseUrl . $this->webTempPath;
+        return $this->path !== null ? $this->path : $this->baseUrl .'/'. $this->webTempPath;
     }
 
     /**
