@@ -73,6 +73,6 @@ class Latte extends MacroSet
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
 
-        return $writer->write('?> src="<?php declare(strict_types = 1); echo  %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))?>" <?php declare(strict_types = 1);');
+        return $writer->write('?> src="<?php echo %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))?>" <?php');
     }
 }
