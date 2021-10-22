@@ -8,6 +8,7 @@ namespace Salamek\Files\Filters;
 use Salamek\Files\FileStorage;
 use Salamek\Files\ImagePipe;
 use Salamek\Files\Models\IFile;
+use Salamek\Files\Models\IStructureFile;
 
 /**
  * Class Icon
@@ -50,14 +51,19 @@ class Latte
 
     /**
      * @param null $file
-     * @param int|null $size
+     * @param string|null $size
      * @param string|null $flags
      * @return string
      * @throws \Nette\Utils\ImageException
      * @throws \Nette\Utils\UnknownImageFileException
      */
-    public function request($file = null, int $size = null, string $flags = null): string
+    public function request($file = null, string $size = null, string $flags = null): string
     {
+        if ($file instanceof IStructureFile) {
+            user_error('Passing IStructureFile into imgPipe is deprecated, pass IFile only', E_USER_DEPRECATED);
+            $file = $file->getFile();
+        }
+
         return $this->imagePipe->request($file, $size, $flags);
     }
 

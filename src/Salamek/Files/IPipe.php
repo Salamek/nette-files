@@ -5,7 +5,7 @@
 
 namespace Salamek\Files;
 
-use Salamek\Files\Models\IStructureFile;
+use Salamek\Files\Models\IFile;
 
 /**
  * Interface IPipe
@@ -14,8 +14,8 @@ use Salamek\Files\Models\IStructureFile;
 interface IPipe
 {
     /**
-     * @param IStructureFile|null $structureFile
+     * @param IFile|null $structureFile
      * @return string
      */
-    public function request(IStructureFile $structureFile = null): string;
+    public function request(IFile $structureFile = null): string;
 }
