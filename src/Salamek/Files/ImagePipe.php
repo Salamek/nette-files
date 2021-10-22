@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
@@ -20,30 +20,18 @@ class ImagePipe extends Pipe
     /** @var array */
     public $onBeforeSaveThumbnail = [];
 
-
     /**
-     * @return TemplateHelpers
-     */
-    public function createTemplateHelpers()
-    {
-        return new TemplateHelpers($this);
-    }
-
-    /**
-     * @param IFile|IStructureFile|null $file
-     * @param null $size
+     * @param IStructureFile|null $structureFile
+     * @param int|null $size
      * @param null $flags
      * @return string
-     * @throws \Nette\Latte\CompileException
-     * @throws FileNotFoundException;
+     * @throws Nette\Utils\ImageException
+     * @throws Nette\Utils\UnknownImageFileException
      */
-    public function request($file = null, $size = null, $flags = null)
+    public function request(IStructureFile $structureFile = null, int $size = null, $flags = null): string
     {
-        if ($file instanceof IStructureFile) {
-            $file = $file->getFile();
-        }
-
-        if ($file) {
+        if ($structureFile) {
+            $file = $structureFile->getFile();
             if ($file->getType() != IFile::TYPE_IMAGE) {
                 throw new \InvalidArgumentException('$file is not an image');
             }
@@ -53,12 +41,8 @@ class ImagePipe extends Pipe
             if (is_null($size)) {
                 return str_replace($this->wwwDir, '', $this->getDataDir()). "/" . $file->getBasename();
             }
-        } elseif (is_null($file)) {
-            if (!$this->blankImage || !file_exists($this->blankImage)) {
-                return "#";
-            }
-
-            return str_replace($this->wwwDir, '', $this->blankImage);
+        } else {
+            throw new Nette\NotImplementedException('Empty image generator');
         }
 
         list($width, $height) = explode("x", $size);
@@ -67,9 +51,9 @@ class ImagePipe extends Pipe
         $thumbnailFile = $this->storageDir . $thumbPath;
 
 
-        if ($flags == null) {
+        if (is_null($flags)) {
             $imageFlags = NImage::FIT;
-        } elseif (!is_int($flags)) {
+        } else {
             switch (strtolower($flags)) {
                 case "fit":
                     $imageFlags = NImage::FIT;
@@ -90,7 +74,7 @@ class ImagePipe extends Pipe
                 case 'crop':
                     break;
                 default:
-                    throw new Nette\Latte\CompileException('Mode is not allowed');
+                    throw new \InvalidArgumentException('Mode is not allowed');
                     break;
             }
         }
@@ -119,7 +103,7 @@ class ImagePipe extends Pipe
                 $img->sharpen();
             }
 
-            $this->onBeforeSaveThumbnail($img, $file, $width, $height, $flags);
+            $this->onBeforeSaveThumbnail($img, $structureFile, $width, $height, $flags);
 
             $img->save($thumbnailFile);
         }

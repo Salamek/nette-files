@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
@@ -15,7 +15,7 @@ interface IStructureFileRepository
      * @param $id
      * @return null|IStructureFile
      */
-    public function getOneById($id);
+    public function getOneById(int $id): ?IStructureFile;
 
     /**
      * @param array|integer $id
@@ -30,11 +30,11 @@ interface IStructureFileRepository
     public function getByStructure(IStructure $structure = null);
 
     /**
-     * @param $name
+     * @param string $name
      * @param IStructure $structure
-     * @return IStructureFile[]
+     * @return mixed
      */
-    public function getOneByNameAndStructure($name, IStructure $structure);
+    public function getOneByNameAndStructure(string $name, IStructure $structure);
 
     /**
      * @param $name
@@ -42,19 +42,19 @@ interface IStructureFileRepository
      * @param IStructureFile|null $structureFileIgnore
      * @return boolean
      */
-    public function isNameFree($name, IStructure $structure = null, IStructureFile $structureFileIgnore = null);
+    public function isNameFree(string $name, IStructure $structure = null, IStructureFile $structureFileIgnore = null): bool;
 
     /**
-     * @param $insertName
+     * @param string $insertName
      * @param IFile $newFile
      * @param IStructure|null $structure
      * @return IStructureFile
      */
-    public function createNewStructureFile($insertName, IFile $newFile, IStructure $structure = null);
+    public function createNewStructureFile(string $insertName, IFile $newFile, IStructure $structure = null): IStructureFile;
 
     /**
      * @param IStructureFile $structureFile
-     * @return mixed
+     * @return void
      */
-    public function deleteStructureFile(IStructureFile $structureFile);
+    public function deleteStructureFile(IStructureFile $structureFile): void;
 }

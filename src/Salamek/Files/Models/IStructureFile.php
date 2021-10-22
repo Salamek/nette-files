@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
@@ -14,25 +14,25 @@ interface IStructureFile
     /**
      * @param string $name
      */
-    public function setName($name);
+    public function setName(string $name);
 
     /**
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * @return IFile
      */
-    public function getFile();
+    public function getFile(): IFile;
 
     /**
      * @return IStructure
      */
-    public function getStructure();
+    public function getStructure(): IStructure;
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getBasename();
+    public function getBasename(): string;
 }

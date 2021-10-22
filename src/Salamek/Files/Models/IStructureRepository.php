@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
@@ -15,10 +15,10 @@ interface IStructureRepository
      * @param $id
      * @return mixed|null|IStructure
      */
-    public function getOneById($id);
+    public function getOneById(int $id): ?IStructure;
 
     /**
-     * @param $id
+     * @param int|array $id
      * @return IStructure[]
      */
     public function getById($id);
@@ -30,22 +30,22 @@ interface IStructureRepository
     public function getByParent(IStructure $structure = null);
 
     /**
-     * @param $name
+     * @param string $name
      * @param IStructure|null $parentStructure
      * @param IStructure|null $ignoreStructure
      * @return boolean
      */
-    public function isNameFree($name, IStructure $parentStructure = null, IStructure $ignoreStructure = null);
+    public function isNameFree(string $name, IStructure $parentStructure = null, IStructure $ignoreStructure = null): bool;
 
     /**
      * @param IStructure $child
      * @param IStructure $parent
      */
-    public function persistAsLastChildOf(IStructure $child, IStructure $parent);
+    public function persistAsLastChildOf(IStructure $child, IStructure $parent): void;
 
     /**
      * @param IStructure $structure
-     * @return mixed
+     * @return void
      */
-    public function deleteStructure(IStructure $structure);
+    public function deleteStructure(IStructure $structure): void;
 }

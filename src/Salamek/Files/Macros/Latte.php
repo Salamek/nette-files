@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
@@ -9,7 +9,6 @@ use Latte\Compiler;
 use Latte\MacroNode;
 use Latte\PhpWriter;
 use Latte\Macros\MacroSet;
-use Nette;
 
 
 /**
@@ -40,13 +39,13 @@ class Latte extends MacroSet
      * @param MacroNode $node
      * @param PhpWriter $writer
      * @return string
-     * @throws Nette\Latte\CompileException
+     * @throws \Latte\CompileException
      */
     public function macroImg(MacroNode $node, PhpWriter $writer)
     {
         $arguments = Helpers::prepareMacroArguments($node->args);
         if ($arguments["name"] === null) {
-            throw new Nette\Latte\CompileException("Please provide filename.");
+            throw new \InvalidArgumentException("Please provide filename.");
         }
 
         $arguments = array_map(function ($value) use ($writer) {
@@ -61,19 +60,19 @@ class Latte extends MacroSet
      * @param MacroNode $node
      * @param PhpWriter $writer
      * @return string
-     * @throws Nette\Latte\CompileException
+     * @throws \Latte\CompileException
      */
     public function macroAttrImg(MacroNode $node, PhpWriter $writer)
     {
         $arguments = Helpers::prepareMacroArguments($node->args);
         if ($arguments["name"] === null) {
-            throw new Nette\Latte\CompileException("Please provide filename.");
+            throw new \InvalidArgumentException("Please provide filename.");
         }
 
         $arguments = array_map(function ($value) use ($writer) {
             return $value ? $writer->formatWord($value) : 'NULL';
         }, $arguments);
 
-        return $writer->write('?> src="<?php echo  %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))?>" <?php');
+        return $writer->write('?> src="<?php declare(strict_types = 1); echo  %modify(call_user_func($this->filters->request, ' . implode(", ", $arguments) . '))?>" <?php declare(strict_types = 1);');
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
@@ -17,63 +17,63 @@ interface IFile
     const TYPE_BINARY = 'binary';
 
     /**
-     * @param $sum
+     * @param string $sum
      */
-    public function setSum($sum);
+    public function setSum(string $sum): void;
 
     /**
-     * @param $size
+     * @param int $size
      */
-    public function setSize($size);
+    public function setSize(int $size): void;
 
     /**
-     * @param $extension
+     * @param string $extension
      */
-    public function setExtension($extension);
+    public function setExtension(string $extension): void;
 
     /**
-     * @param $mimeType
+     * @param string $mimeType
      */
-    public function setMimeType($mimeType);
+    public function setMimeType(string $mimeType): void;
 
     /**
      * @param string $type
      */
-    public function setType($type = self::TYPE_BINARY);
+    public function setType(string $type = self::TYPE_BINARY): void;
 
     /**
      * @return string
      */
-    public function getSum();
+    public function getSum(): string;
 
     /**
      * @return int
      */
-    public function getSize();
+    public function getSize(): int;
 
     /**
      * @return string
      */
-    public function getExtension();
+    public function getExtension(): string;
 
     /**
      * @return string
      */
-    public function getMimeType();
+    public function getMimeType(): string;
 
     /**
      * @return string
      */
-    public function getType();
+    public function getType(): string;
 
     /**
      * @return boolean
      */
-    public function isExists();
+    public function isExists(): bool;
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getBasename();
+    public function getBasename(): string;
 
 }

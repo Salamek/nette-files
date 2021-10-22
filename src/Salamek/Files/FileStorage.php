@@ -1,13 +1,13 @@
-<?php
+<?php declare(strict_types = 1);
 
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
 namespace Salamek\Files;
 
-use Nette;
 use Nette\Http\FileUpload;
 use Nette\Application\Responses\FileResponse;
+use Nette\SmartObject;
 use Nette\Utils\Image as NImage;
 use Salamek\Files\Models\IFile;
 use Salamek\Files\Models\IFileRepository;
@@ -22,7 +22,7 @@ use Salamek\Files\Models\IStructureRepository;
  */
 class FileStorage
 {
-    use Nette\SmartObject;
+    use SmartObject;
 
     const ICON = 'ico';
     const ICON_DARK = 'ico_dark';
@@ -32,9 +32,6 @@ class FileStorage
 
     /** @var string */
     private $iconDir;
-
-    /** @var string */
-    private $wwwDir;
 
     /** @var IStructureRepository */
     private $structureRepository;
@@ -120,18 +117,16 @@ class FileStorage
 
     /**
      * FileStorage constructor.
-     * @param $dir
-     * @param $iconDir
-     * @param $wwwDir
+     * @param string $dir
+     * @param string $iconDir
      * @param IStructureRepository $structureRepository
      * @param IFileRepository $fileRepository
      * @param IStructureFileRepository $structureFileRepository
      */
-    public function __construct($dir, $iconDir, $wwwDir, IStructureRepository $structureRepository, IFileRepository $fileRepository, IStructureFileRepository $structureFileRepository)
+    public function __construct(string $dir, string $iconDir, IStructureRepository $structureRepository, IFileRepository $fileRepository, IStructureFileRepository $structureFileRepository)
     {
         $this->setDataDir($dir);
         $this->setIconDir($iconDir);
-        $this->wwwDir = $wwwDir;
         $this->structureRepository = $structureRepository;
         $this->fileRepository = $fileRepository;
         $this->structureFileRepository = $structureFileRepository;
@@ -139,9 +134,9 @@ class FileStorage
 
 
     /**
-     * @param $dir
+     * @param string $dir
      */
-    public function setDataDir($dir)
+    public function setDataDir(string $dir): void
     {
         if (!is_dir($dir)) {
             umask(0);
@@ -151,9 +146,9 @@ class FileStorage
     }
 
     /**
-     * @param $iconDir
+     * @param string $iconDir
      */
-    public function setIconDir($iconDir)
+    public function setIconDir(string $iconDir): void
     {
         if (!is_dir($iconDir)) {
             umask(0);
@@ -165,17 +160,9 @@ class FileStorage
     /**
      * @return string
      */
-    public function getIconDir()
+    public function getIconDir(): string
     {
         return $this->iconDir;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getIconDirWww()
-    {
-        return str_replace($this->wwwDir, '', $this->getIconDir());
     }
 
     /**
@@ -184,7 +171,7 @@ class FileStorage
      * @return bool
      * @throws \Exception
      */
-    public function isFileType($filePath, $type = IFile::TYPE_IMAGE)
+    public function isFileType(string $filePath, $type = IFile::TYPE_IMAGE): bool
     {
         $info = pathinfo($filePath);
         $testArray = [];
@@ -218,8 +205,8 @@ class FileStorage
         }
 
         //Mime type testing
-        if (function_exists('finfo_open')) {
-            $mime = $this->getMimeType($filePath);
+        $mime = $this->getMimeType($filePath);
+        if (!is_null($mime)) {
 
             switch ($type) {
                 case IFile::TYPE_IMAGE:
@@ -255,7 +242,7 @@ class FileStorage
      * @return array
      * @throws \Exception
      */
-    public function getStructureFilesInfo(IStructure $structure)
+    public function getStructureFilesInfo(IStructure $structure): array
     {
         $data = [
             'files' => 0,
@@ -290,11 +277,11 @@ class FileStorage
     }
 
     /**
-     * @param $filePath
-     * @return mixed|null
+     * @param string $filePath
+     * @return string|null
      * @throws \Exception
      */
-    public function detectType($filePath)
+    public function detectType(string $filePath): ?string
     {
         $types = [];
         $types[] = IFile::TYPE_IMAGE;
@@ -317,7 +304,7 @@ class FileStorage
      * @return mixed
      * @throws \Exception
      */
-    public function processFile($info, IStructure $structure = null)
+    public function processFile($info, IStructure $structure = null): ?IStructureFile
     {
         if ($info instanceof \SplFileInfo) {
             $file = $info->getRealPath();
@@ -328,7 +315,7 @@ class FileStorage
             $name = pathinfo($info->getSanitizedName(), PATHINFO_FILENAME);
             $upload = true;
         } else {
-            throw new \Exception('Unknow info');
+            throw new \Exception('Unknown info');
         }
 
         $md5 = md5_file($file);
@@ -393,7 +380,6 @@ class FileStorage
         if ($upload) {
             $cnt = 0;
 
-            $insertName = $name;
             do {
                 $insertName = $name . ($cnt ? $cnt : '');
                 $cnt++;
@@ -416,10 +402,10 @@ class FileStorage
 
 
     /**
-     * @param $filePath
-     * @return mixed
+     * @param string $filePath
+     * @return string|null
      */
-    public function getMimeType($filePath)
+    public function getMimeType(string $filePath): ?string
     {
         if (function_exists('finfo_open')) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -433,12 +419,12 @@ class FileStorage
     }
 
     /**
-     * @param $zipArchive
-     * @param $structureTree
+     * @param \ZipArchive $zipArchive
+     * @param array $structureTree
      * @param string $path
      * @throws \Exception
      */
-    private function structureToZip($zipArchive, $structureTree, $path = '')
+    private function structureToZip(\ZipArchive $zipArchive, array $structureTree, string $path = ''): void
     {
         foreach ($structureTree AS $k => $v) {
             if (array_key_exists('directory', $v)) {
@@ -468,8 +454,9 @@ class FileStorage
     /**
      * @param IStructureFile $structureFile
      * @return FileResponse
+     * @throws \Nette\Application\BadRequestException
      */
-    public function downloadFile(IStructureFile $structureFile)
+    public function downloadFile(IStructureFile $structureFile): FileResponse
     {
         $path = $this->dataDir . '/' . $structureFile->getFile()->getBasename();
         return new FileResponse($path, $structureFile->getBasename(), $structureFile->getFile()->getMimeType());
@@ -480,7 +467,7 @@ class FileStorage
      * @return FileResponse
      * @throws \Exception
      */
-    public function downloadStructure(IStructure $structure)
+    public function downloadStructure(IStructure $structure): FileResponse
     {
         $info = $this->getStructureFilesInfo($structure);
 
@@ -503,7 +490,7 @@ class FileStorage
     /**
      * @param IFile $file
      */
-    private function deleteFile(IFile $file)
+    public function deleteFile(IFile $file): void
     {
         $this->fileRepository->deleteFile($file);
     }
@@ -511,7 +498,7 @@ class FileStorage
     /**
      * @param IStructureFile $IStructureFile
      */
-    public function deleteStructureFile(IStructureFile $IStructureFile)
+    public function deleteStructureFile(IStructureFile $IStructureFile): void
     {
         $this->structureFileRepository->deleteStructureFile($IStructureFile);
     }
@@ -519,7 +506,7 @@ class FileStorage
     /**
      * @param IStructure $structure
      */
-    public function deleteStructure(IStructure $structure)
+    public function deleteStructure(IStructure $structure): void
     {
         $this->structureRepository->deleteStructure($structure);
     }
@@ -527,7 +514,7 @@ class FileStorage
     /**
      * @return string
      */
-    public function getDataDir()
+    public function getDataDir(): string
     {
         return $this->dataDir;
     }
@@ -536,7 +523,7 @@ class FileStorage
      * @param IFile $file
      * @return string
      */
-    public function getFileSystemPath(IFile $file)
+    public function getFileSystemPath(IFile $file): string
     {
         return $this->getDataDir().'/'.$file->getBasename();
     }
@@ -546,7 +533,7 @@ class FileStorage
      * @param string $type
      * @return string
      */
-    public function getIcon(IFile $file, $type = self::ICON)
+    public function getIcon(IFile $file, string $type = self::ICON): string
     {
         $extension = $file->getExtension();
         if (in_array($extension, $this->iconsSupported))
@@ -558,7 +545,7 @@ class FileStorage
             $fileSystemPath = $this->iconDir.'/'.$type.'/txt.jpg';
         }
 
-        return str_replace($this->wwwDir, '', $fileSystemPath);
+        return $fileSystemPath;
     }
 }
 

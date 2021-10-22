@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
@@ -14,7 +14,7 @@ class Tools
     /**
      * @return int
      */
-    public static function getMaxUploadSize()
+    public static function getMaxUploadSize(): int
     {
         $max_size = -1;
 
@@ -30,10 +30,10 @@ class Tools
     }
 
     /**
-     * @param $size
-     * @return mixed
+     * @param string $size
+     * @return float
      */
-    public static function parseSize($size)
+    public static function parseSize(string $size): float
     {
         $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
         $size = preg_replace('/[^0-9\.]/', '', $size);

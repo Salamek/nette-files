@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
@@ -28,9 +28,8 @@ trait TImagePipe
 
 
     /**
-     * @param string $class
-     *
-     * @return Nette\Templating\FileTemplate
+     * @param null $class
+     * @return Nette\Templating\FileTemplate|\stdClass
      */
     protected function createTemplate($class = null)
     {

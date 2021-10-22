@@ -1,11 +1,15 @@
-<?php
+<?php declare(strict_types = 1);
 /**
  * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
  */
 
 namespace Salamek\Files;
 
-use Nette;
+
+use Nette\Http\Request;
+use Nette\InvalidStateException;
+use Nette\IOException;
+use Nette\SmartObject;
 
 /**
  * Class Pipe
@@ -13,34 +17,30 @@ use Nette;
  */
 abstract class Pipe implements IPipe
 {
-    use Nette\SmartObject;
+    use SmartObject;
 
     /** @var string */
     protected $dataDir;
+
     /** @var string */
     protected $storageDir;
-    /** @var string */
-    protected $blankImage;
-    /** @var string */
-    protected $wwwDir;
+
     /** @var string */
     private $path;
+
     /** @var string */
     private $baseUrl;
 
     /**
+     * Pipe constructor.
      * @param $dataDir
      * @param $storageDir
-     * @param $blankImage
-     * @param $wwwDir
-     * @param Nette\Http\Request $httpRequest
+     * @param Request $httpRequest
      */
-    public function __construct($dataDir, $storageDir, $blankImage, $wwwDir, Nette\Http\Request $httpRequest)
+    public function __construct(string $dataDir, string $storageDir, Request $httpRequest)
     {
-        $this->wwwDir = $wwwDir;
         $this->dataDir = $dataDir;
         $this->storageDir = $storageDir;
-        $this->blankImage = $blankImage;
         $this->baseUrl = rtrim($httpRequest->url->baseUrl, '/');
 
         $this->checkSettings();
@@ -49,7 +49,7 @@ abstract class Pipe implements IPipe
     /**
      * @return string
      */
-    public function getDataDir()
+    public function getDataDir(): string
     {
         return $this->dataDir;
     }
@@ -57,7 +57,7 @@ abstract class Pipe implements IPipe
     /**
      * @param $dir
      */
-    public function setDataDir($dir)
+    public function setDataDir(string $dir)
     {
         $this->dataDir = $dir;
     }
@@ -65,7 +65,7 @@ abstract class Pipe implements IPipe
     /**
      * @return string
      */
-    public function getStorageDir()
+    public function getStorageDir(): string
     {
         return $this->storageDir;
     }
@@ -73,57 +73,41 @@ abstract class Pipe implements IPipe
     /**
      * @param string $storageDir
      */
-    public function setStorageDir($storageDir)
+    public function setStorageDir(string $storageDir): void
     {
         $this->storageDir = $storageDir;
     }
 
     /**
-     * @return string
+     * @throws InvalidStateException
      */
-    public function getBlankImage()
-    {
-        return $this->blankImage;
-    }
-
-    /**
-     * @param string $blankImage
-     */
-    public function setBlankImage($blankImage)
-    {
-        $this->blankImage = $blankImage;
-    }
-
-    /**
-     * @throws \Nette\InvalidStateException
-     */
-    private function checkSettings()
+    private function checkSettings(): void
     {
         if ($this->dataDir == null) {
-            throw new Nette\InvalidStateException("Assets directory is not setted");
+            throw new InvalidStateException("Assets directory is not setted");
         }
         if (!file_exists($this->dataDir)) {
-            throw new Nette\InvalidStateException("Assets directory '{$this->dataDir}' does not exists");
+            throw new InvalidStateException("Assets directory '{$this->dataDir}' does not exists");
         } elseif (!is_writeable($this->dataDir)) {
-            throw new Nette\InvalidStateException("Make assets directory '{$this->dataDir}' writeable");
+            throw new InvalidStateException("Make assets directory '{$this->dataDir}' writeable");
         }
         if ($this->getPath() == null) {
-            throw new Nette\InvalidStateException("Path is not setted");
+            throw new InvalidStateException("Path is not setted");
         }
     }
 
     /**
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
-        return $this->path !== null ? $this->path : $this->baseUrl . str_replace($this->wwwDir, '', $this->storageDir);
+        return $this->path !== null ? $this->path : $this->baseUrl . $this->storageDir;
     }
 
     /**
      * @param $path
      */
-    public function setPath($path)
+    public function setPath(string $path): void
     {
         $this->path = $path;
     }
@@ -134,7 +118,7 @@ abstract class Pipe implements IPipe
      * @throws \Nette\IOException
      * @return void
      */
-    public static function mkdir($dir)
+    public static function mkdir(string $dir): void
     {
         $oldMask = umask(0);
         @mkdir($dir, 0777, true);
@@ -142,7 +126,7 @@ abstract class Pipe implements IPipe
         umask($oldMask);
 
         if (!is_dir($dir) || !is_writable($dir)) {
-            throw new Nette\IOException("Please create writable directory $dir.");
+            throw new IOException("Please create writable directory $dir.");
         }
     }
 }

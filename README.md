@@ -11,7 +11,7 @@ The best way to install salamek/nette-files is using  [Composer](http://getcompo
 
 
 ```sh
-$ composer require salamek/nette-files:@dev
+$ composer require salamek/nette-files
 ```
 
 Then you have to register extension in `config.neon`.
@@ -22,16 +22,15 @@ Then you have to register extension in `config.neon`.
 
     files:
         dataDir: %wwwDir%/data
-        storageDir: %wwwDir%/webtemp
+        wwwTempDir: %wwwDir%/webtemp
         iconDir: %wwwDir%/assets/file
-        blankImage: %wwwDir%/assets/file/ico/zip.jpg
 ```
 
 You will need to implement:
 * IFile entity representing single file
 * IFileRepository repository for IFile
 * IStructure entity representing single structure item (Folder/Directory)
-* IStructureRepositry repository for IStructure
+* IStructureRepository repository for IStructure
 * IStructureFile entity representing connection of IFile to IStructure (in what folder is what file)
 * IStructureFileRepository repository for IStructureFile
 
