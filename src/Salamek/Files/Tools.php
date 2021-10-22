@@ -31,16 +31,18 @@ class Tools
 
     /**
      * @param string $size
-     * @return float
+     * @return int
      */
-    public static function parseSize(string $size): float
+    public static function parseSize(string $size): int
     {
         $unit = preg_replace('/[^bkmgtpezy]/i', '', $size);
         $size = preg_replace('/[^0-9\.]/', '', $size);
         if ($unit) {
-            return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
+            $calculatedSize = round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
         } else {
-            return round($size);
+            $calculatedSize = round($size);
         }
+
+        return intval($calculatedSize);
     }
 }
