@@ -35,13 +35,13 @@ class FilesExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         $builder->addDefinition($this->prefix('imagePipe'))
-            ->setClass(ImagePipe::class, [$config['dataDir'], $config['webTempDir']]);
+            ->setFactory(ImagePipe::class, [$config['dataDir'], $config['webTempDir']]);
 
         $builder->addDefinition($this->prefix('fileStorage'))
-            ->setClass(FileStorage::class, [$config['dataDir'], $config['iconDir']]);
+            ->setFactory(FileStorage::class, [$config['dataDir'], $config['iconDir']]);
         
         $builder->addDefinition($this->prefix('filters'))
-            ->setClass(Latte::class)
+            ->setFactory(Latte::class)
             ->setAutowired(false);
     }
 
