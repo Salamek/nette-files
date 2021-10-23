@@ -15,10 +15,6 @@ use Salamek\Files\Models\IFile;
  */
 class ImagePipe extends Pipe
 {
-
-    /** @var array */
-    public $onBeforeSaveThumbnail = [];
-
     /**
      * @param int $width
      * @param int|null $height
@@ -59,7 +55,7 @@ class ImagePipe extends Pipe
      * @return Image
      * @throws Nette\Utils\UnknownImageFileException
      */
-    private function resizeImage($sourcePath, int $width = null, int $height = null, string $flags = null): Image {
+    private function resizeImage(string $sourcePath, int $width = null, int $height = null, string $flags = null): Image {
         if (is_null($flags)) {
             $imageFlags = Image::FIT;
         } else {
@@ -116,6 +112,42 @@ class ImagePipe extends Pipe
         return $img;
     }
 
+    private function resizeSvgImage(string $sourcePath, string $thumbnailFile, int $width = null, int $height = null): void {
+
+        $dom = new \DOMDocument('1.0', 'utf-8');
+        $dom->load($sourcePath);
+        $svg = $dom->documentElement;
+
+        $pattern = '/^(\d*\.\d+|\d+)(px)?$/'; // positive number, px unit optional
+        $interpretable =  preg_match( $pattern, $svg->getAttribute('width'), $detectedWidthInfo) &&
+            preg_match( $pattern, $svg->getAttribute('height'), $detectedHeightInfo);
+
+        if ($interpretable) {
+            $detectedWidth = $detectedWidthInfo[0];
+            $detectedHeight = $detectedHeightInfo[0];
+
+            if (!$svg->hasAttribute('viewBox') ) {
+                // userspace coordinates
+                $view_box = implode(' ', [0, 0, $detectedWidth, $detectedHeight]);
+                $svg->setAttribute('viewBox', $view_box);
+            }
+
+            if (is_null($width) && $height) {
+                $ratio = $detectedHeight / $height;
+                $width = intval(round($detectedWidth / $ratio));
+            } elseif (is_null($height) && $width) {
+                $ratio = $detectedWidth / $width;
+                $height = intval(round($detectedHeight / $ratio));
+            }
+
+            $svg->setAttribute('width', strval($width));
+            $svg->setAttribute('height', strval($height));
+        }
+
+
+        $dom->save($thumbnailFile);
+    }
+
     /**
      * @param IFile|null $file
      * @param string|null $size
@@ -129,8 +161,8 @@ class ImagePipe extends Pipe
             [$width, $height,] = [null, null];
         } else {
             $parts = explode('x', $size);
-            $width = intval($parts[0]);
-            $height = intval($parts[1]);
+            $width = ($parts[0] ? intval($parts[0]) : null);
+            $height = ($parts[1] ? intval($parts[1]) : null);
         }
 
         if ($file) {
@@ -139,16 +171,23 @@ class ImagePipe extends Pipe
             }
 
             $originalFile = $this->dataDir . '/' . $file->getBasename();
-            $generator = function () use ($originalFile, $width, $height, $flags): Image {
-                return $this->resizeImage($originalFile, $width, $height, $flags);
-            };
+            if (strpos($file->getMimeType(), 'svg') !== false) {
+                $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
+                    $this->resizeSvgImage($originalFile, $thumbnailFile, $width, $height);
+                };
+            } else {
+                $generator = function ($thumbnailFile) use ($originalFile, $width, $height, $flags): void {
+                    $this->resizeImage($originalFile, $width, $height, $flags)->save($thumbnailFile);
+                };
+            }
+
             $image = $file->getBasename();
         } else {
             if (!$width) {
                 $width = 100;
             }
-            $generator = function () use ($width, $height, $flags): Image {
-                return $this->generateImagePlaceholder($width, ($height ? $height : null));
+            $generator = function ($thumbnailFile) use ($width, $height): void {
+                $this->generateImagePlaceholder($width, ($height ? $height : null))->save($thumbnailFile);
             };
 
             $image = 'placeholder';
@@ -160,12 +199,7 @@ class ImagePipe extends Pipe
         if (!file_exists($thumbnailFile)) {
 
             $this->mkdir(dirname($thumbnailFile));
-
-            $img = $generator();
-
-            $this->onBeforeSaveThumbnail($img, $file, $width, $height, $flags);
-
-            $img->save($thumbnailFile);
+            $generator($thumbnailFile);
         }
 
         return $this->getPath() . $thumbPath;
