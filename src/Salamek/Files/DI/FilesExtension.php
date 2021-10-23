@@ -9,6 +9,7 @@ use Nette\Bridges\ApplicationLatte\LatteFactory;
 use Nette\DI\CompilerExtension;
 use Nette\Schema\Expect;
 use Nette\Schema\Schema;
+use Salamek\Files\FileIconPipe;
 use Salamek\Files\FileStorage;
 use Salamek\Files\Filters\Latte;
 use Salamek\Files\ImagePipe;
@@ -41,6 +42,8 @@ class FilesExtension extends CompilerExtension
         $builder->addDefinition($this->prefix('imagePipe'))
             ->setFactory(ImagePipe::class, [$this->prefix('@fileStorage'),  $config['webTempPath']]);
 
+        $builder->addDefinition($this->prefix('fileIconPipe'))
+            ->setFactory(FileIconPipe::class, [$this->prefix('@fileStorage'),  $config['webTempPath']]);
 
         
         $builder->addDefinition($this->prefix('filters'))
