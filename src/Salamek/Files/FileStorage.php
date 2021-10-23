@@ -195,7 +195,6 @@ class FileStorage
         return $this->webTempDir;
     }
 
-
     /**
      * @param $filePath
      * @param $type
@@ -585,7 +584,7 @@ class FileStorage
      * @throws \Nette\IOException
      * @return void
      */
-    private static function mkdir(string $dir): void
+    public static function mkdir(string $dir): void
     {
         $oldMask = umask(0);
         @mkdir($dir, 0777, true);

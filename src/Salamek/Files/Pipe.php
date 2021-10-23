@@ -49,6 +49,7 @@ abstract class Pipe implements IPipe
 
     /**
      * @return string
+     * @deprecated
      */
     public function getDataDir(): string
     {
@@ -58,6 +59,7 @@ abstract class Pipe implements IPipe
 
     /**
      * @return string
+     * @deprecated
      */
     public function getWebTempDir(): string
     {

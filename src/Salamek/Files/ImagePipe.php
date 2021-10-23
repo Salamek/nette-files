@@ -125,8 +125,9 @@ class ImagePipe extends Pipe
         $svg = $dom->documentElement;
 
         $pattern = '/^(\d*\.\d+|\d+)(px)?$/'; // positive number, px unit optional
-        $interpretable =  preg_match( $pattern, $svg->getAttribute('width'), $detectedWidthInfo) &&
-            preg_match( $pattern, $svg->getAttribute('height'), $detectedHeightInfo);
+        $matchWidth = preg_match( $pattern, $svg->getAttribute('width'), $detectedWidthInfo);
+        $matchHeight = preg_match( $pattern, $svg->getAttribute('height'), $detectedHeightInfo);
+        $interpretable = $matchWidth && $matchHeight;
 
         if ($interpretable) {
             $detectedWidth = $detectedWidthInfo[0];
@@ -175,7 +176,7 @@ class ImagePipe extends Pipe
                 throw new \InvalidArgumentException('$file is not an image');
             }
 
-            $originalFile = $this->dataDir . '/' . $file->getBasename();
+            $originalFile = $this->fileStorage->getFileSystemPath($file);
             if (strpos($file->getMimeType(), 'svg') !== false) {
                 $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
                     $this->resizeSvgImage($originalFile, $thumbnailFile, $width, $height);
@@ -199,11 +200,11 @@ class ImagePipe extends Pipe
         }
 
         $thumbPath = '/' . $flags . '_' . $width . 'x' . $height . '/' . $image;
-        $thumbnailFile = $this->webTempDir . $thumbPath;
+        $thumbnailFile = $this->fileStorage->getWebTempDir() . $thumbPath;
 
         if (!file_exists($thumbnailFile)) {
 
-            $this->mkdir(dirname($thumbnailFile));
+            $this->fileStorage->mkdir(dirname($thumbnailFile));
             $generator($thumbnailFile);
         }
 
