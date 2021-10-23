@@ -54,8 +54,6 @@ class FilesExtension extends CompilerExtension
 
         $latteFactoryService = $builder->getDefinitionByType(LatteFactory::class)->getResultDefinition();
         $latteFactoryService->addSetup('addFilter', ['request', [$this->prefix('@filters'), 'request']]);
-        $latteFactoryService->addSetup('addFilter', ['fileIcon', [$this->prefix('@filters'), 'fileIcon']]);
         $latteFactoryService->addSetup('Salamek\Files\Macros\Latte::install(?->getCompiler())', ['@self']);
-
     }
 }

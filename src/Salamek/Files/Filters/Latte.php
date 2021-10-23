@@ -5,9 +5,7 @@
 
 namespace Salamek\Files\Filters;
 
-use Salamek\Files\FileStorage;
 use Salamek\Files\ImagePipe;
-use Salamek\Files\Models\IFile;
 use Salamek\Files\Models\IStructureFile;
 
 /**
@@ -15,30 +13,16 @@ use Salamek\Files\Models\IStructureFile;
  */
 class Latte
 {
-    /** @var FileStorage */
-    private $fileStorage;
-
     /** @var ImagePipe */
     private $imagePipe;
 
     /**
      * Latte constructor.
-     * @param FileStorage $fileStorage
      * @param ImagePipe $imagePipe
      */
-    public function __construct(FileStorage $fileStorage, ImagePipe $imagePipe)
+    public function __construct(ImagePipe $imagePipe)
     {
-        $this->fileStorage = $fileStorage;
         $this->imagePipe = $imagePipe;
-    }
-
-    /**
-     * @param IFile $file
-     * @return string
-     */
-    public function fileIcon(IFile $file): string
-    {
-        return $this->fileStorage->getIcon($file);
     }
 
     /**

@@ -562,7 +562,7 @@ class FileStorage
      * @param IFile $file
      * @return string
      */
-    public function getIcon(IFile $file): string
+    public function getIconFileSystemPath(IFile $file): string
     {
         $extension = $file->getExtension();
         if (in_array($extension, $this->iconsSupported))
