@@ -64,7 +64,7 @@ class ImagePipe extends Pipe
 
         if (!file_exists($thumbnailFile)) {
 
-            $this->fileStorage->mkdir(dirname($thumbnailFile));
+            Tools::mkdir(dirname($thumbnailFile));
             $generator($thumbnailFile);
         }
 

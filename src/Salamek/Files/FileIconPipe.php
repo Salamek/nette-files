@@ -53,7 +53,7 @@ class FileIconPipe extends Pipe
 
         if (!file_exists($iconTmpFile)) {
 
-            $this->fileStorage->mkdir(dirname($iconTmpFile));
+            Tools::mkdir(dirname($iconTmpFile));
             $generator($iconTmpFile);
         }
 

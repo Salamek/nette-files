@@ -5,6 +5,7 @@
 
 namespace Salamek\Files;
 
+use Nette\IOException;
 use Nette\Utils\Image;
 
 /**
@@ -29,6 +30,24 @@ class Tools
             }
         }
         return $max_size;
+    }
+
+    /**
+     * @param string $dir
+     *
+     * @throws \Nette\IOException
+     * @return void
+     */
+    public static function mkdir(string $dir): void
+    {
+        $oldMask = umask(0);
+        @mkdir($dir, 0777, true);
+        @chmod($dir, 0777);
+        umask($oldMask);
+
+        if (!is_dir($dir) || !is_writable($dir)) {
+            throw new IOException("Please create writable directory $dir.");
+        }
     }
 
     /**

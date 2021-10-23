@@ -152,7 +152,7 @@ class FileStorage
     public function setDataDir(string $dir): void
     {
         if (!is_dir($dir)) {
-            $this->mkdir($dir);
+           Tools::mkdir($dir);
         }
         $this->dataDir = $dir;
     }
@@ -163,7 +163,7 @@ class FileStorage
     public function setIconDir(string $iconDir): void
     {
         if (!is_dir($iconDir)) {
-            $this->mkdir($iconDir);
+            Tools::mkdir($iconDir);
         }
         $this->iconDir = $iconDir;
     }
@@ -174,7 +174,7 @@ class FileStorage
     public function setWebTempDir(string $webTempDir): void
     {
         if (!is_dir($webTempDir)) {
-            $this->mkdir($webTempDir);
+            Tools::mkdir($webTempDir);
         }
         $this->webTempDir = $webTempDir;
     }
@@ -364,18 +364,25 @@ class FileStorage
             }
 
             $newFile = $this->fileRepository->createNewFile($md5, $info->getSize(), $extension, $mimeType, $this->detectType($file));
-            
+
+            $fileSystemPath = $this->getFileSystemPath($newFile);
+
+            $dataDirForFile = $this->getDataDirForFile($newFile);
+            if (!is_dir($dataDirForFile)) {
+                Tools::mkdir($dataDirForFile);
+            }
+
             if ($upload) {
-                $result = $info->move($this->dataDir . '/' . $newFile->getSum(). '.' . $newFile->getExtension());
+                $result = $info->move($fileSystemPath);
             } else {
-                $result = copy($file, $this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
+                $result = copy($file, $fileSystemPath);
             }
 
             //When image, check EXIF for rotation if possible
             if($newFile->getType() == IFile::TYPE_IMAGE && in_array(strtolower($newFile->getExtension()), ['jpg', 'jpeg',' tiff']) && function_exists('exif_read_data')) {
-                $exif = @exif_read_data($this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
+                $exif = @exif_read_data($fileSystemPath);
                 if ($exif && !empty($exif['Orientation'])) {
-                    $img = NImage::fromFile($this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
+                    $img = NImage::fromFile($fileSystemPath);
                     switch ($exif['Orientation']) {
                         case 8:
                             //90
@@ -391,7 +398,7 @@ class FileStorage
                             break;
                     }
 
-                    $img->save($this->dataDir . '/' . $newFile->getSum() . '.' . $newFile->getExtension());
+                    $img->save($fileSystemPath);
                 }
             }
 
@@ -466,7 +473,7 @@ class FileStorage
             if (array_key_exists('files', $v)) {
                 foreach ($v['files'] AS $fileId) {
                     $file = $this->structureFileRepository->getOneById($fileId);
-                    $filePath = $this->dataDir . '/' . $file->getFile()->getSum() . '.' . $file->getFile()->getExtension();
+                    $filePath = $this->getFileSystemPath($file);
 
                     if (!is_file($filePath)) {
                         throw new \Exception(sprintf('File %s for pack not found', $filePath));
@@ -488,7 +495,7 @@ class FileStorage
      */
     public function downloadFile(IStructureFile $structureFile): FileResponse
     {
-        $path = $this->dataDir . '/' . $structureFile->getFile()->getBasename();
+        $path = $this->getFileSystemPath($structureFile->getFile());
         return new FileResponse($path, $structureFile->getBasename(), $structureFile->getFile()->getMimeType());
     }
 
@@ -553,13 +560,21 @@ class FileStorage
      * @param IFile $file
      * @return string
      */
-    public function getFileSystemPath(IFile $file): string
-    {
-        return $this->getDataDir().'/'.$file->getBasename();
+    public function getDataDirForFile(IFile $file): string {
+        return $this->getDataDir().'/'.substr($file->getSum(), 0, 2);
     }
 
     /**
      * @param IFile $file
+     * @return string
+     */
+    public function getFileSystemPath(IFile $file): string
+    {
+        return $this->getDataDirForFile($file).'/'.$file->getBasename();
+    }
+
+    /**
+     * @param string $extenson
      * @return string
      */
     public function getIconFileSystemPath(string $extenson): string
@@ -580,24 +595,6 @@ class FileStorage
     public function getIconNameForExtension(string $extension): string
     {
         return (in_array($extension, $this->iconsSupported) ? $extension : 'txt');
-    }
-
-    /**
-     * @param string $dir
-     *
-     * @throws \Nette\IOException
-     * @return void
-     */
-    public static function mkdir(string $dir): void
-    {
-        $oldMask = umask(0);
-        @mkdir($dir, 0777, true);
-        @chmod($dir, 0777);
-        umask($oldMask);
-
-        if (!is_dir($dir) || !is_writable($dir)) {
-            throw new IOException("Please create writable directory $dir.");
-        }
     }
 }
 

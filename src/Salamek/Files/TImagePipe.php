@@ -10,6 +10,7 @@ use Nette;
 /**
  * Class TImagePipe
  * @package Salamek\Files
+ * @deprecated
  */
 trait TImagePipe
 {
@@ -20,9 +21,11 @@ trait TImagePipe
 
     /**
      * @param ImagePipe $imgPipe
+     * @deprecated
      */
     public function injectImgPipe(ImagePipe $imgPipe)
     {
+        user_error('Dont use TImagePipe, it is deprecated, jus use latte filters/macros or autowire requested pipe service', E_USER_DEPRECATED);
         $this->imgPipe = $imgPipe;
     }
 
