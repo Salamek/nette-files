@@ -15,11 +15,11 @@ use Salamek\Files\Models\IFile;
 class FileIconPipe extends Pipe
 {
     /**
-     * @param IFile|null $file
+     * @param string|null $file
      * @param string|null $size
      * @return string
      */
-    public function request(IFile $file = null, string $size = null): string
+    public function request(string $iconName = null, string $size = null): string
     {
         if (is_null($size)){
             [$width, $height,] = [null, null];
@@ -29,19 +29,14 @@ class FileIconPipe extends Pipe
             $height = ($parts[1] ? intval($parts[1]) : null);
         }
 
-        if ($file) {
-            $originalFile = $this->fileStorage->getIconFileSystemPath($file);
-            if (strpos($file->getMimeType(), 'svg') !== false) {
-                $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
-                    Tools::resizeSvgImage($originalFile, $width, $height)->save($thumbnailFile);
-                };
-            } else {
-                $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
-                    Tools::resizeImage($originalFile, $width, $height)->save($thumbnailFile);
-                };
-            }
+        if ($iconName) {
+            $originalFile = $this->fileStorage->getIconFileSystemPath($iconName);
 
-            $image = $this->fileStorage->getIconBaseName($file);
+            $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
+                Tools::resizeImage($originalFile, $width, $height)->save($thumbnailFile);
+            };
+
+            $image = $this->fileStorage->getIconBaseName($iconName);
         } else {
             if (!$width) {
                 $width = 64;

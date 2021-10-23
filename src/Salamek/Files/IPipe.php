@@ -14,8 +14,7 @@ use Salamek\Files\Models\IFile;
 interface IPipe
 {
     /**
-     * @param IFile|null $structureFile
      * @return string
      */
-    public function request(IFile $structureFile = null): string;
+    public function request(): string;
 }

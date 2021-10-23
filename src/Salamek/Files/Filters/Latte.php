@@ -8,6 +8,7 @@ namespace Salamek\Files\Filters;
 use Salamek\Files\FileIconPipe;
 use Salamek\Files\ImagePipe;
 use Salamek\Files\Models\IFile;
+use Salamek\Files\Models\IStructure;
 use Salamek\Files\Models\IStructureFile;
 
 /**
@@ -49,13 +50,16 @@ class Latte
     }
 
     /**
-     * @param IFile|null $file
+     * @param IFile|string|null $file
      * @param string|null $size
      * @return string
      */
-    public function fileIconRequest(IFile $file = null, string $size = null): string
+    public function fileIconRequest($iconName = null, string $size = null): string
     {
-        return $this->fileIconPipe->request($file, $size);
+        if ($iconName instanceof IFile) {
+            $iconName = $iconName->getExtension();
+        }
+        return $this->fileIconPipe->request($iconName, $size);
     }
 
 }
