@@ -564,17 +564,25 @@ class FileStorage
      */
     public function getIconFileSystemPath(IFile $file): string
     {
+        $iconBaseName = $this->getIconBaseName($file);
+        return $this->iconDir.'/'.$iconBaseName;
+    }
+
+    /**
+     * @param IFile $file
+     * @return string
+     */
+    public function getIconBaseName(IFile $file): string
+    {
         $extension = $file->getExtension();
         if (in_array($extension, $this->iconsSupported))
         {
-            $fileSystemPath = $this->iconDir.'/'.$extension.'.jpg';
+            return $extension.'.jpg';
         }
         else
         {
-            $fileSystemPath = $this->iconDir.'/txt.jpg';
+            return 'txt.jpg';
         }
-
-        return $fileSystemPath;
     }
 
     /**

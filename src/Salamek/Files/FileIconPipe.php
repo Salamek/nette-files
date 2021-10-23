@@ -5,23 +5,21 @@
  */
 namespace Salamek\Files;
 
-use Nette;
-use Nette\Utils\Image;
+
 use Salamek\Files\Models\IFile;
 
 /**
  * Class ImagePipe
  * @package Salamek\Files
  */
-class ImagePipe extends Pipe
+class FileIconPipe extends Pipe
 {
     /**
      * @param IFile|null $file
      * @param string|null $size
-     * @param string|null $flags
      * @return string
      */
-    public function request(IFile $file = null, string $size = null, string $flags = null): string
+    public function request(IFile $file = null, string $size = null): string
     {
         if (is_null($size)){
             [$width, $height,] = [null, null];
@@ -36,21 +34,21 @@ class ImagePipe extends Pipe
                 throw new \InvalidArgumentException('$file is not an image');
             }
 
-            $originalFile = $this->fileStorage->getFileSystemPath($file);
+            $originalFile = $this->fileStorage->getIconFileSystemPath($file);
             if (strpos($file->getMimeType(), 'svg') !== false) {
                 $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
                     Tools::resizeSvgImage($originalFile, $width, $height)->save($thumbnailFile);
                 };
             } else {
-                $generator = function ($thumbnailFile) use ($originalFile, $width, $height, $flags): void {
-                    Tools::resizeImage($originalFile, $width, $height, $flags)->save($thumbnailFile);
+                $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
+                    Tools::resizeImage($originalFile, $width, $height)->save($thumbnailFile);
                 };
             }
 
-            $image = $file->getBasename();
+            $image = $this->fileStorage->getIconBaseName($file);
         } else {
             if (!$width) {
-                $width = 100;
+                $width = 64;
             }
             $generator = function ($thumbnailFile) use ($width, $height): void {
                 Tools::generateImagePlaceholder($width, ($height ? $height : null))->save($thumbnailFile);
@@ -59,15 +57,15 @@ class ImagePipe extends Pipe
             $image = 'placeholder.jpg';
         }
 
-        $thumbPath = '/' . $flags . '_' . $width . 'x' . $height . '/' . $image;
-        $thumbnailFile = $this->fileStorage->getWebTempDir() . $thumbPath;
+        $iconTmpPath = '/icon_' . $width . 'x' . $height . '/' . $image;
+        $iconTmpFile = $this->fileStorage->getWebTempDir() . $iconTmpPath;
 
-        if (!file_exists($thumbnailFile)) {
+        if (!file_exists($iconTmpFile)) {
 
-            $this->fileStorage->mkdir(dirname($thumbnailFile));
-            $generator($thumbnailFile);
+            $this->fileStorage->mkdir(dirname($iconTmpFile));
+            $generator($iconTmpFile);
         }
 
-        return $this->getRelativeWebTempPath() . $thumbPath;
+        return $this->getRelativeWebTempPath() . $iconTmpPath;
     }
 }
