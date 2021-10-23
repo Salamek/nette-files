@@ -30,10 +30,6 @@ class FileIconPipe extends Pipe
         }
 
         if ($file) {
-            if ($file->getType() != IFile::TYPE_IMAGE) {
-                throw new \InvalidArgumentException('$file is not an image');
-            }
-
             $originalFile = $this->fileStorage->getIconFileSystemPath($file);
             if (strpos($file->getMimeType(), 'svg') !== false) {
                 $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
