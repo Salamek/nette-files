@@ -54,8 +54,6 @@ class Latte
      * @param string|null $size
      * @param string|null $flags
      * @return string
-     * @throws \Nette\Utils\ImageException
-     * @throws \Nette\Utils\UnknownImageFileException
      */
     public function request($file = null, string $size = null, string $flags = null): string
     {

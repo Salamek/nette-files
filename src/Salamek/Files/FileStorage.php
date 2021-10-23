@@ -560,19 +560,18 @@ class FileStorage
 
     /**
      * @param IFile $file
-     * @param string $type
      * @return string
      */
-    public function getIcon(IFile $file, string $type = self::ICON): string
+    public function getIcon(IFile $file): string
     {
         $extension = $file->getExtension();
         if (in_array($extension, $this->iconsSupported))
         {
-            $fileSystemPath = $this->iconDir.'/'.$type.'/'.$extension.'.jpg';
+            $fileSystemPath = $this->iconDir.'/'.$extension.'.jpg';
         }
         else
         {
-            $fileSystemPath = $this->iconDir.'/'.$type.'/txt.jpg';
+            $fileSystemPath = $this->iconDir.'/txt.jpg';
         }
 
         return $fileSystemPath;
