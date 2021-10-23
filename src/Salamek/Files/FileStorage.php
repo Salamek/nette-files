@@ -7,6 +7,7 @@ namespace Salamek\Files;
 
 use Nette\Http\FileUpload;
 use Nette\Application\Responses\FileResponse;
+use Nette\IOException;
 use Nette\SmartObject;
 use Nette\Utils\Image as NImage;
 use Salamek\Files\Models\IFile;
@@ -32,6 +33,9 @@ class FileStorage
 
     /** @var string */
     private $iconDir;
+
+    /** @var string */
+    private $webTempDir;
 
     /** @var IStructureRepository */
     private $structureRepository;
@@ -119,14 +123,23 @@ class FileStorage
      * FileStorage constructor.
      * @param string $dir
      * @param string $iconDir
+     * @param string $webTempDir
      * @param IStructureRepository $structureRepository
      * @param IFileRepository $fileRepository
      * @param IStructureFileRepository $structureFileRepository
      */
-    public function __construct(string $dir, string $iconDir, IStructureRepository $structureRepository, IFileRepository $fileRepository, IStructureFileRepository $structureFileRepository)
+    public function __construct(
+        string $dir,
+        string $iconDir,
+        string $webTempDir,
+        IStructureRepository $structureRepository,
+        IFileRepository $fileRepository,
+        IStructureFileRepository $structureFileRepository
+    )
     {
         $this->setDataDir($dir);
         $this->setIconDir($iconDir);
+        $this->setWebTempDir($webTempDir);
         $this->structureRepository = $structureRepository;
         $this->fileRepository = $fileRepository;
         $this->structureFileRepository = $structureFileRepository;
@@ -139,8 +152,7 @@ class FileStorage
     public function setDataDir(string $dir): void
     {
         if (!is_dir($dir)) {
-            umask(0);
-            mkdir($dir, 0777);
+            $this->mkdir($dir);
         }
         $this->dataDir = $dir;
     }
@@ -151,10 +163,20 @@ class FileStorage
     public function setIconDir(string $iconDir): void
     {
         if (!is_dir($iconDir)) {
-            umask(0);
-            mkdir($iconDir, 0777);
+            $this->mkdir($iconDir);
         }
         $this->iconDir = $iconDir;
+    }
+
+    /**
+     * @param string $webTempDir
+     */
+    public function setWebTempDir(string $webTempDir): void
+    {
+        if (!is_dir($webTempDir)) {
+            $this->mkdir($webTempDir);
+        }
+        $this->webTempDir = $webTempDir;
     }
 
     /**
@@ -164,6 +186,15 @@ class FileStorage
     {
         return $this->iconDir;
     }
+
+    /**
+     * @return string
+     */
+    public function getWebTempDir(): string
+    {
+        return $this->webTempDir;
+    }
+
 
     /**
      * @param $filePath
@@ -546,6 +577,24 @@ class FileStorage
         }
 
         return $fileSystemPath;
+    }
+
+    /**
+     * @param string $dir
+     *
+     * @throws \Nette\IOException
+     * @return void
+     */
+    private static function mkdir(string $dir): void
+    {
+        $oldMask = umask(0);
+        @mkdir($dir, 0777, true);
+        @chmod($dir, 0777);
+        umask($oldMask);
+
+        if (!is_dir($dir) || !is_writable($dir)) {
+            throw new IOException("Please create writable directory $dir.");
+        }
     }
 }
 

@@ -112,6 +112,12 @@ class ImagePipe extends Pipe
         return $img;
     }
 
+    /**
+     * @param string $sourcePath
+     * @param string $thumbnailFile
+     * @param int|null $width
+     * @param int|null $height
+     */
     private function resizeSvgImage(string $sourcePath, string $thumbnailFile, int $width = null, int $height = null): void {
 
         $dom = new \DOMDocument('1.0', 'utf-8');
@@ -153,7 +159,6 @@ class ImagePipe extends Pipe
      * @param string|null $size
      * @param string|null $flags
      * @return string
-     * @throws Nette\Utils\ImageException
      */
     public function request(IFile $file = null, string $size = null, string $flags = null): string
     {
@@ -202,6 +207,6 @@ class ImagePipe extends Pipe
             $generator($thumbnailFile);
         }
 
-        return $this->getPath() . $thumbPath;
+        return $this->getRelativeWebTempPath() . $thumbPath;
     }
 }

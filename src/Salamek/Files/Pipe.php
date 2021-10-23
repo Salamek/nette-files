@@ -7,8 +7,6 @@ namespace Salamek\Files;
 
 
 use Nette\Http\Request;
-use Nette\InvalidStateException;
-use Nette\IOException;
 use Nette\SmartObject;
 
 /**
@@ -19,35 +17,34 @@ abstract class Pipe implements IPipe
 {
     use SmartObject;
 
-    /** @var string */
-    protected $dataDir;
-
-    /** @var string */
-    protected $webTempDir;
+    /** @var FileStorage */
+    protected $fileStorage;
 
     /** @var string */
     protected $webTempPath;
-
-    /** @var string */
-    private $path;
 
     /** @var string */
     private $baseUrl;
 
     /**
      * Pipe constructor.
-     * @param $dataDir
-     * @param $webTempDir
+     * @param FileStorage $fileStorage
+     * @param string $webTempPath
      * @param Request $httpRequest
      */
-    public function __construct(string $dataDir, string $webTempDir, string $webTempPath, Request $httpRequest)
+    public function __construct(FileStorage $fileStorage, string $webTempPath, Request $httpRequest)
     {
-        $this->dataDir = $dataDir;
-        $this->webTempDir = $webTempDir;
+        $this->fileStorage = $fileStorage;
         $this->webTempPath = $webTempPath;
         $this->baseUrl = rtrim($httpRequest->url->baseUrl, '/');
+    }
 
-        $this->checkSettings();
+    /**
+     * @return FileStorage
+     */
+    public function getFileStorage(): FileStorage
+    {
+        return $this->fileStorage;
     }
 
     /**
@@ -55,15 +52,8 @@ abstract class Pipe implements IPipe
      */
     public function getDataDir(): string
     {
-        return $this->dataDir;
-    }
-
-    /**
-     * @param $dir
-     */
-    public function setDataDir(string $dir)
-    {
-        $this->dataDir = $dir;
+        user_error('Pipe::getDataDir is deprecated, use Pipe->getFileStorage()->getDataDir() instead', E_USER_DEPRECATED);
+        return $this->fileStorage->getDataDir();
     }
 
     /**
@@ -71,58 +61,23 @@ abstract class Pipe implements IPipe
      */
     public function getWebTempDir(): string
     {
-        return $this->webTempDir;
-    }
-
-    /**
-     * @throws InvalidStateException
-     */
-    private function checkSettings(): void
-    {
-        if ($this->dataDir == null) {
-            throw new InvalidStateException("Assets directory is not setted");
-        }
-        if (!file_exists($this->dataDir)) {
-            throw new InvalidStateException("Assets directory '{$this->dataDir}' does not exists");
-        } elseif (!is_writeable($this->dataDir)) {
-            throw new InvalidStateException("Make assets directory '{$this->dataDir}' writeable");
-        }
-        if ($this->getPath() == null) {
-            throw new InvalidStateException("Path is not setted");
-        }
+        user_error('Pipe::getWebTempDir is deprecated, use Pipe->getFileStorage()->getWebTempDir() instead', E_USER_DEPRECATED);
+        return $this->fileStorage->getWebTempDir();
     }
 
     /**
      * @return string
      */
-    public function getPath(): string
+    public function getWebTempPath(): string
     {
-        return $this->path !== null ? $this->path : $this->baseUrl .'/'. $this->webTempPath;
+        return $this->webTempPath;
     }
 
     /**
-     * @param $path
+     * @return string
      */
-    public function setPath(string $path): void
+    public function getRelativeWebTempPath(): string
     {
-        $this->path = $path;
-    }
-
-    /**
-     * @param string $dir
-     *
-     * @throws \Nette\IOException
-     * @return void
-     */
-    public static function mkdir(string $dir): void
-    {
-        $oldMask = umask(0);
-        @mkdir($dir, 0777, true);
-        @chmod($dir, 0777);
-        umask($oldMask);
-
-        if (!is_dir($dir) || !is_writable($dir)) {
-            throw new IOException("Please create writable directory $dir.");
-        }
+        return $this->baseUrl .'/'. $this->webTempPath;
     }
 }
