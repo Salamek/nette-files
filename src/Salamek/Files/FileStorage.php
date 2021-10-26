@@ -472,13 +472,13 @@ class FileStorage
 
             if (array_key_exists('files', $v)) {
                 foreach ($v['files'] AS $fileId) {
-                    $file = $this->structureFileRepository->getOneById($fileId);
-                    $filePath = $this->getFileSystemPath($file);
+                    $structureFile = $this->structureFileRepository->getOneById($fileId);
+                    $filePath = $this->getFileSystemPath($structureFile->getFile());
 
                     if (!is_file($filePath)) {
                         throw new \Exception(sprintf('File %s for pack not found', $filePath));
                     }
-                    $zipArchive->addFile($filePath, $path . '/' . $file->getName() . '.' . $file->getFile()->getExtension());
+                    $zipArchive->addFile($filePath, $path . '/' . $structureFile->getName() . '.' . $structureFile->getFile()->getExtension());
                 }
             }
 
