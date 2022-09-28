@@ -38,8 +38,14 @@ class ImagePipe extends Pipe
 
             $originalFile = $this->fileStorage->getFileSystemPath($file);
             if (strpos($file->getMimeType(), 'svg') !== false) {
+                // Image is SVG, use special resize for SVG
                 $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
                     Tools::resizeSvgImage($originalFile, $width, $height)->save($thumbnailFile);
+                };
+            } else if (strpos($file->getMimeType(), 'icon') !== false) {
+                // Image is ico, we do not support those, but they are image, copy them
+                $generator = function ($thumbnailFile) use ($originalFile, $width, $height, $flags): void {
+                    copy($originalFile, $thumbnailFile);
                 };
             } else {
                 $generator = function ($thumbnailFile) use ($originalFile, $width, $height, $flags): void {
