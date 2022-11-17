@@ -29,7 +29,7 @@ interface IStructureFile
     /**
      * @return IStructure
      */
-    public function getStructure(): IStructure;
+    public function getStructure(): ?IStructure;
 
     /**
      * @return string
