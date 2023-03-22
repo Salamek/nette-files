@@ -73,4 +73,4 @@ output:
 
 ### Resizing ImagePipe flags
 
-For resizing (third argument) you can use these keywords - `fit`, `fill`, `exact`, `stretch`, `shrink_only`, `stretch`, `crop`. For details see comments above [these constants](http://api.nette.org/2.0/source-common.Image.php.html#105)
+For resizing (third argument) you can use these keywords - `fit`, `fill`, `exact`, `stretch`, `shrink_only`, `stretch`, `fit_exact`, `crop`. For details see comments above [these constants](http://api.nette.org/2.0/source-common.Image.php.html#105)
