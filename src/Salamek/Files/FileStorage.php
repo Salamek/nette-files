@@ -327,14 +327,12 @@ class FileStorage
         return null;
     }
 
-
     /**
-     * @param \SplFileInfo|FileUpload $info
-     * @param null|IStructure $structure
-     * @return mixed
-     * @throws \Exception
+     * Save file into storage
+     * @param $info SplFileInfo or FileUpload
+     * @returns IFile
      */
-    public function processFile($info, IStructure $structure = null): ?IStructureFile
+    public function saveFile($info): IFile
     {
         if ($info instanceof \SplFileInfo) {
             $file = $info->getRealPath();
@@ -402,7 +400,6 @@ class FileStorage
                 }
             }
 
-
             if (!$result) {
                 throw new \Exception('Failed to save file');
             }
@@ -412,9 +409,22 @@ class FileStorage
             }
             $newFile = $this->fileRepository->getOneBySum($md5);
         }
+        return $newFile;
+    }
 
+    /**
+     * @param \SplFileInfo|FileUpload $info
+     * @param null|IStructure $structure
+     * @return mixed
+     * @throws \Exception
+     */
+    public function processFile($info, IStructure $structure = null): ?IStructureFile
+    {
+        $newFile = $this->saveFile($info);
 
-        if ($upload) {
+        // Upload
+        if ($info instanceof FileUpload) {
+            $name = pathinfo($info->getSanitizedName(), PATHINFO_FILENAME);
             $cnt = 0;
 
             do {
@@ -424,6 +434,7 @@ class FileStorage
 
             $structureFile = $this->structureFileRepository->createNewStructureFile($insertName, $newFile, $structure);
         } else {
+            $name = $info->getBasename('.' . $info->getExtension());
             $structureFile = $this->structureFileRepository->getOneByNameAndStructure($name, $structure);
 
             $foundMd5Name = $this->fileRepository->getOneBySum($name);
