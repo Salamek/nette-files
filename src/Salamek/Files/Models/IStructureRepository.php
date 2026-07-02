@@ -27,7 +27,7 @@ interface IStructureRepository
      * @param IStructure|null $structure
      * @return IStructure[]
      */
-    public function getByParent(IStructure $structure = null);
+    public function getByParent(?IStructure $structure = null);
 
     /**
      * @param string $name
@@ -35,7 +35,7 @@ interface IStructureRepository
      * @param IStructure|null $ignoreStructure
      * @return boolean
      */
-    public function isNameFree(string $name, IStructure $parentStructure = null, IStructure $ignoreStructure = null): bool;
+    public function isNameFree(string $name, ?IStructure $parentStructure = null, ?IStructure $ignoreStructure = null): bool;
 
     /**
      * @param IStructure $child

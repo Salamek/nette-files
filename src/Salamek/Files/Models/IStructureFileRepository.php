@@ -27,7 +27,7 @@ interface IStructureFileRepository
      * @param IStructure|null $structure
      * @return IStructureFile[]
      */
-    public function getByStructure(IStructure $structure = null);
+    public function getByStructure(?IStructure $structure = null);
 
     /**
      * @param string $name
@@ -42,7 +42,7 @@ interface IStructureFileRepository
      * @param IStructureFile|null $structureFileIgnore
      * @return boolean
      */
-    public function isNameFree(string $name, IStructure $structure = null, IStructureFile $structureFileIgnore = null): bool;
+    public function isNameFree(string $name, ?IStructure $structure = null, ?IStructureFile $structureFileIgnore = null): bool;
 
     /**
      * @param string $insertName
@@ -50,7 +50,7 @@ interface IStructureFileRepository
      * @param IStructure|null $structure
      * @return IStructureFile
      */
-    public function createNewStructureFile(string $insertName, IFile $newFile, IStructure $structure = null): IStructureFile;
+    public function createNewStructureFile(string $insertName, IFile $newFile, ?IStructure $structure = null): IStructureFile;
 
     /**
      * @param IStructureFile $structureFile

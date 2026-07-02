@@ -20,7 +20,7 @@ interface IStructure
      * @param IStructure|null $parent
      * @return void
      */
-    public function setParent(IStructure $parent = null): void;
+    public function setParent(?IStructure $parent = null): void;
 
     /**
      * @return string

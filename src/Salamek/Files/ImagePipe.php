@@ -21,7 +21,7 @@ class ImagePipe extends Pipe
      * @param string|null $flags
      * @return string
      */
-    public function request(IFile $file = null, string $size = null, string $flags = null): string
+    public function request(?IFile $file = null, ?string $size = null, ?string $flags = null): string
     {
         if (is_null($size)){
             [$width, $height,] = [null, null];

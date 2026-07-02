@@ -39,7 +39,7 @@ class Latte
      * @param string|null $flags
      * @return string
      */
-    public function imageRequest($file = null, string $size = null, string $flags = null): string
+    public function imageRequest($file = null, ?string $size = null, ?string $flags = null): string
     {
         if ($file instanceof IStructureFile) {
             user_error('Passing IStructureFile into imgPipe is deprecated, pass IFile only', E_USER_DEPRECATED);
@@ -54,7 +54,7 @@ class Latte
      * @param string|null $size
      * @return string
      */
-    public function fileIconRequest($iconName = null, string $size = null): string
+    public function fileIconRequest($iconName = null, ?string $size = null): string
     {
         if ($iconName instanceof IFile) {
             $iconName = $iconName->getExtension();

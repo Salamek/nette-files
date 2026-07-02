@@ -3,23 +3,24 @@
 	"type": "library",
 	"description": "File storage for Nette Framework",
 	"keywords": ["nette", "images", "files"],
-	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
+	"license": ["BSD-3-Clause", "GPL-2.0-only", "GPL-3.0-only"],
 	"authors": [
 		{
 			"name": "Adam Schubert"
 		}
 	],
 	"require": {
+		"php": ">=8.3 <8.6",
 		"ext-gd": "*",
 		"ext-zip": "*",
 		"ext-fileinfo": "*",
 		"ext-exif": "*",
 		"ext-dom": "*",
-		"latte/latte": "^2.10",
-		"nette/di": "^3.0",
-		"nette/http": "^3.1",
-		"nette/utils": ">=3.2",
-		"nette/application": "^3.1"
+		"latte/latte": "^3.1.4 <3.2",
+		"nette/di": "^3.2.6",
+		"nette/http": "^3.3",
+		"nette/utils": "^4.0",
+		"nette/application": "^3.3"
 	},
 	"require-dev": {
 		"nette/tester": "@dev"

@@ -418,7 +418,7 @@ class FileStorage
      * @return mixed
      * @throws \Exception
      */
-    public function processFile($info, IStructure $structure = null): ?IStructureFile
+    public function processFile($info, ?IStructure $structure = null): ?IStructureFile
     {
         $newFile = $this->saveFile($info);
 

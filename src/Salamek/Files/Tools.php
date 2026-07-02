@@ -67,7 +67,7 @@ class Tools
         return intval($calculatedSize);
     }
 
-    public static function generateImagePlaceholder(int $width, int $height = null): Image {
+    public static function generateImagePlaceholder(int $width, ?int $height = null): Image {
         $usedHeight = ($height ? $height : $width);
         $image = Image::fromBlank($width, $usedHeight, Image::rgb(204, 204, 204));
         $fontFile = __DIR__.'/RobotoMono-Regular.ttf';
@@ -102,7 +102,7 @@ class Tools
      * @return Image
      * @throws \Nette\Utils\UnknownImageFileException
      */
-    public static function resizeImage(string $sourcePath, int $width = null, int $height = null, string $flags = null): Image {
+    public static function resizeImage(string $sourcePath, ?int $width = null, ?int $height = null, ?string $flags = null): Image {
         if (is_null($flags)) {
             $imageFlags = Image::FIT;
         } else {
@@ -165,7 +165,7 @@ class Tools
      * @param int|null $height
      * @return \DOMDocument
      */
-    public static function resizeSvgImage(string $sourcePath, int $width = null, int $height = null): \DOMDocument {
+    public static function resizeSvgImage(string $sourcePath, ?int $width = null, ?int $height = null): \DOMDocument {
 
         $dom = new \DOMDocument('1.0', 'utf-8');
         $dom->load($sourcePath);

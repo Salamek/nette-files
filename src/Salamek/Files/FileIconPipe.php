@@ -19,7 +19,7 @@ class FileIconPipe extends Pipe
      * @param string|null $size
      * @return string
      */
-    public function request(string $iconName = null, string $size = null): string
+    public function request(?string $iconName = null, ?string $size = null): string
     {
         if (is_null($size)){
             [$width, $height,] = [null, null];

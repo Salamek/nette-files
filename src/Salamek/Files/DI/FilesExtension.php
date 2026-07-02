@@ -13,6 +13,7 @@ use Salamek\Files\FileIconPipe;
 use Salamek\Files\FileStorage;
 use Salamek\Files\Filters\Latte;
 use Salamek\Files\ImagePipe;
+use Salamek\Files\Latte\FilesLatteExtension;
 
 
 /**
@@ -49,6 +50,10 @@ class FilesExtension extends CompilerExtension
         $builder->addDefinition($this->prefix('filters'))
             ->setFactory(Latte::class)
             ->setAutowired(false);
+
+        $builder->addDefinition($this->prefix('latteExtension'))
+            ->setFactory(FilesLatteExtension::class, [$this->prefix('@filters')])
+            ->setAutowired(false);
     }
 
     public function beforeCompile()
@@ -56,8 +61,6 @@ class FilesExtension extends CompilerExtension
         $builder = $this->getContainerBuilder();
 
         $latteFactoryService = $builder->getDefinitionByType(LatteFactory::class)->getResultDefinition();
-        $latteFactoryService->addSetup('addFilter', ['imageRequest', [$this->prefix('@filters'), 'imageRequest']]);
-        $latteFactoryService->addSetup('addFilter', ['fileIconRequest', [$this->prefix('@filters'), 'fileIconRequest']]);
-        $latteFactoryService->addSetup('Salamek\Files\Macros\Latte::install(?->getCompiler())', ['@self']);
+        $latteFactoryService->addSetup('addExtension', [$this->prefix('@latteExtension')]);
     }
 }

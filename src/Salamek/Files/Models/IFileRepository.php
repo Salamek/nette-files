@@ -34,7 +34,7 @@ interface IFileRepository
      * @param IFile|null $fileIgnore
      * @return boolean
      */
-    public function isSumFree(string $sum, IFile $fileIgnore = null): bool;
+    public function isSumFree(string $sum, ?IFile $fileIgnore = null): bool;
 
     /**
      * @param string $sum
