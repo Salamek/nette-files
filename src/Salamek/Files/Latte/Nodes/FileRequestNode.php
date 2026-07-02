@@ -30,7 +30,7 @@ class FileRequestNode extends StatementNode
         $expression = new FileRequestExpressionNode($filterName, $args);
 
         if ($tag->isNAttribute()) {
-            return new ExpressionAttributeNode('src', $expression, new ModifierNode([]), position: $tag->position);
+            return new ExpressionAttributeNode('src', $expression, new ModifierNode([]), ' ', position: $tag->position);
         }
 
         $node = new self;
