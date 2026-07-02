@@ -455,13 +455,10 @@ class FileStorage
      */
     public function getMimeType(string $filePath): ?string
     {
-        if (function_exists('finfo_open')) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+	if (class_exists('finfo')) {
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
 
-            $mime = finfo_file($finfo, $filePath);
-
-            finfo_close($finfo);
-            return $mime;
+            return $finfo->file($filePath);
         }
         return null;
     }
