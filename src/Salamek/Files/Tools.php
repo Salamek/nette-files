@@ -40,10 +40,7 @@ class Tools
      */
     public static function mkdir(string $dir): void
     {
-        $oldMask = umask(0);
-        @mkdir($dir, 0777, true);
-        @chmod($dir, 0777);
-        umask($oldMask);
+        if (!is_dir($dir)) { @mkdir($dir, 0770, true); }
 
         if (!is_dir($dir) || !is_writable($dir)) {
             throw new IOException("Please create writable directory $dir.");
@@ -141,6 +138,12 @@ class Tools
         }
 
         $img = Image::fromFile($sourcePath);
+        if (function_exists('exif_read_data') && exif_imagetype($sourcePath) === IMAGETYPE_JPEG) {
+            $exif = @exif_read_data($sourcePath);
+            $rotation = match ((int) ($exif['Orientation'] ?? 1)) { 3 => 180, 6 => -90, 8 => 90, default => 0 };
+            if ($rotation !== 0) { $img->rotate($rotation, 0); }
+        }
+
 
         if ($flags === "crop") {
             $img->crop('50%', '50%', $width, $height);

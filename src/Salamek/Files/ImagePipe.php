@@ -1,79 +1,21 @@
-<?php declare(strict_types = 1);
-
-/**
- * Copyright (C) 2016 Adam Schubert <adam.schubert@sg1-game.net>.
- */
+<?php declare(strict_types=1);
 namespace Salamek\Files;
+use Salamek\Files\Access\{FileReference, FileUrl, VariantRegistry};
 
-use Nette;
-use Nette\Utils\Image;
-use Salamek\Files\Models\IFile;
-
-/**
- * Class ImagePipe
- * @package Salamek\Files
- */
-class ImagePipe extends Pipe
+/** URL generation only. Image transformations happen after authorization at delivery. */
+class ImagePipe
 {
-    /**
-     * @param IFile|null $file
-     * @param string|null $size
-     * @param string|null $flags
-     * @return string
-     */
-    public function request(?IFile $file = null, ?string $size = null, ?string $flags = null): string
+    public function __construct(private FileUrl $urls, private VariantRegistry $variants) {}
+
+    public function request(?FileReference $file = null, ?string $size = null, ?string $flags = null): string
     {
-        if (is_null($size)){
-            [$width, $height,] = [null, null];
-        } else {
-            $parts = explode('x', $size);
-            $width = ($parts[0] ? intval($parts[0]) : null);
-            $height = ($parts[1] ? intval($parts[1]) : null);
+        if ($file !== null) { return $this->urls->create($file, $this->variants->forImage($size, $flags)); }
+        // A generic placeholder contains no uploaded/user data and needs no endpoint.
+        $width = 100; $height = 100;
+        if ($size !== null) {
+            $recipe = $this->variants->get($this->variants->forImage($size, $flags));
+            $width = $recipe[0] ?? $recipe[1]; $height = $recipe[1] ?? $recipe[0];
         }
-
-        if ($file) {
-            if ($file->getType() != IFile::TYPE_IMAGE) {
-                throw new \InvalidArgumentException('$file is not an image');
-            }
-
-            $originalFile = $this->fileStorage->getFileSystemPath($file);
-            if (strpos($file->getMimeType(), 'svg') !== false) {
-                // Image is SVG, use special resize for SVG
-                $generator = function ($thumbnailFile) use ($originalFile, $width, $height): void {
-                    Tools::resizeSvgImage($originalFile, $width, $height)->save($thumbnailFile);
-                };
-            } else if (strpos($file->getMimeType(), 'icon') !== false) {
-                // Image is ico, we do not support those, but they are image, copy them
-                $generator = function ($thumbnailFile) use ($originalFile, $width, $height, $flags): void {
-                    copy($originalFile, $thumbnailFile);
-                };
-            } else {
-                $generator = function ($thumbnailFile) use ($originalFile, $width, $height, $flags): void {
-                    Tools::resizeImage($originalFile, $width, $height, $flags)->save($thumbnailFile);
-                };
-            }
-
-            $image = $file->getBasename();
-        } else {
-            if (!$width) {
-                $width = 100;
-            }
-            $generator = function ($thumbnailFile) use ($width, $height): void {
-                Tools::generateImagePlaceholder($width, ($height ? $height : null))->save($thumbnailFile);
-            };
-
-            $image = 'placeholder.jpg';
-        }
-
-        $thumbPath = '/' . $flags . '_' . $width . 'x' . $height . '/' . $image;
-        $thumbnailFile = $this->fileStorage->getWebTempDir() . $thumbPath;
-
-        if (!file_exists($thumbnailFile)) {
-
-            Tools::mkdir(dirname($thumbnailFile));
-            $generator($thumbnailFile);
-        }
-
-        return $this->getRelativeWebTempPath() . $thumbPath;
+        return 'data:image/svg+xml;base64,' . base64_encode('<svg xmlns="http://www.w3.org/2000/svg" width="' . $width . '" height="' . $height . '"><rect width="100%" height="100%" fill="#e9ecef"/></svg>');
     }
 }

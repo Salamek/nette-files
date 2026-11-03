@@ -20,6 +20,8 @@ class FilesLatteExtension extends Extension
     public function getFilters(): array
     {
         return [
+            'fileContent' => [$this->filters, 'fileContent'],
+            'fileRequest' => [$this->filters, 'fileRequest'],
             'imageRequest' => [$this->filters, 'imageRequest'],
             'fileIconRequest' => [$this->filters, 'fileIconRequest'],
         ];
@@ -28,6 +30,7 @@ class FilesLatteExtension extends Extension
     public function getTags(): array
     {
         return [
+            'file' => fn($tag) => FileRequestNode::create($tag, 'fileRequest'),
             'img' => fn($tag) => FileRequestNode::create($tag, 'imageRequest'),
             'n:img' => fn($tag) => FileRequestNode::create($tag, 'imageRequest'),
             'fileIcon' => fn($tag) => FileRequestNode::create($tag, 'fileIconRequest'),

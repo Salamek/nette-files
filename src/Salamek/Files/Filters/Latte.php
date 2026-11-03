@@ -27,7 +27,7 @@ class Latte
      * @param ImagePipe $imagePipe
      * @param FileIconPipe $fileIconPipe
      */
-    public function __construct(ImagePipe $imagePipe, FileIconPipe $fileIconPipe)
+    public function __construct(ImagePipe $imagePipe, FileIconPipe $fileIconPipe, private \Salamek\Files\Access\FileUrl $urls, private \Salamek\Files\Access\BodyFiles $bodyFiles)
     {
         $this->imagePipe = $imagePipe;
         $this->fileIconPipe = $fileIconPipe;
@@ -41,12 +41,17 @@ class Latte
      */
     public function imageRequest($file = null, ?string $size = null, ?string $flags = null): string
     {
-        if ($file instanceof IStructureFile) {
-            user_error('Passing IStructureFile into imgPipe is deprecated, pass IFile only', E_USER_DEPRECATED);
-            $file = $file->getFile();
-        }
-
         return $this->imagePipe->request($file, $size, $flags);
+    }
+
+    public function fileContent(?string $html, string $provider, int|string $reference): string
+    {
+        return $this->bodyFiles->rewrite($html ?? '', $provider, $reference);
+    }
+
+    public function fileRequest(\Salamek\Files\Access\FileReference $file, string $variant = 'original'): string
+    {
+        return $this->urls->create($file, $variant);
     }
 
     /**

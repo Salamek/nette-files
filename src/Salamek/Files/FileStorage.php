@@ -346,9 +346,9 @@ class FileStorage
             throw new \Exception('Unknown info');
         }
 
-        $md5 = md5_file($file);
+        $sum = hash_file('sha256', $file);
 
-        if ($this->fileRepository->isSumFree($md5)) {
+        if ($this->fileRepository->isSumFree($sum)) {
             if ($upload) {
                 $extension = strtolower(pathinfo($info->getSanitizedName(), PATHINFO_EXTENSION));
                 $mimeType = $info->getContentType();
@@ -361,7 +361,7 @@ class FileStorage
                 throw new \Exception('Failed to detect extension!');
             }
 
-            $newFile = $this->fileRepository->createNewFile($md5, $info->getSize(), $extension, $mimeType, $this->detectType($file));
+            $newFile = $this->fileRepository->createNewFile($sum, $info->getSize(), $extension, $mimeType, $this->detectType($file));
 
             $fileSystemPath = $this->getFileSystemPath($newFile);
 
@@ -376,29 +376,8 @@ class FileStorage
                 $result = copy($file, $fileSystemPath);
             }
 
-            //When image, check EXIF for rotation if possible
-            if($newFile->getType() == IFile::TYPE_IMAGE && in_array(strtolower($newFile->getExtension()), ['jpg', 'jpeg',' tiff']) && function_exists('exif_read_data')) {
-                $exif = @exif_read_data($fileSystemPath);
-                if ($exif && !empty($exif['Orientation'])) {
-                    $img = NImage::fromFile($fileSystemPath);
-                    switch ($exif['Orientation']) {
-                        case 8:
-                            //90
-                            $img->rotate(90, 0);
-                            break;
-                        case 3:
-                            //180
-                            $img->rotate(180, 0);
-                            break;
-                        case 6:
-                            //-90
-                            $img->rotate(-90, 0);
-                            break;
-                    }
-
-                    $img->save($fileSystemPath);
-                }
-            }
+            // Originals are immutable: their checksum always identifies the stored bytes.
+            // EXIF orientation is applied only while generating image variants.
 
             if (!$result) {
                 throw new \Exception('Failed to save file');
@@ -407,7 +386,7 @@ class FileStorage
             if ($upload) {
                 unlink($file);
             }
-            $newFile = $this->fileRepository->getOneBySum($md5);
+            $newFile = $this->fileRepository->getOneBySum($sum);
         }
         return $newFile;
     }
