@@ -11,8 +11,11 @@ final class BodyFiles
 
     public function rewrite(string $html, string $provider, int|string $owner): string
     {
-        return preg_replace_callback('~\b(src|href|poster)(\s*=\s*)(["\'])(.*?)\3~is', function (array $match) use ($provider, $owner): string {
-            $sum = $this->sumFromUrl(html_entity_decode($match[4], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $embeddedUrls = array_fill_keys($this->urlsFromHtml($html), true);
+        return preg_replace_callback('~\b(src|href|poster)(\s*=\s*)(["\'])(.*?)\3~is', function (array $match) use ($provider, $owner, $embeddedUrls): string {
+            $url = html_entity_decode($match[4], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if (!isset($embeddedUrls[$url])) { return $match[0]; }
+            $sum = $this->sumFromUrl($url);
             $file = $sum ? $this->find($sum) : null;
             if (!$file) { return $match[0]; }
             $url = $this->urls->create(new FileReference($provider, $owner . '-' . $sum, $file));
@@ -22,11 +25,22 @@ final class BodyFiles
 
     public function resolve(string $html, string $sum): ?IFile
     {
-        preg_match_all('~\b(?:src|href|poster)\s*=\s*(["\'])(.*?)\1~is', $html, $matches);
-        foreach ($matches[2] as $url) {
-            if ($this->sumFromUrl(html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8')) === $sum) { return $this->find($sum); }
+        foreach ($this->urlsFromHtml($html) as $url) {
+            if ($this->sumFromUrl($url) === $sum) { return $this->find($sum); }
         }
         return null;
+    }
+
+    /** Only actual rendered link/embed attributes establish an attachment relationship. */
+    private function urlsFromHtml(string $html): array
+    {
+        if ($html === '') { return []; }
+        $document = new \DOMDocument();
+        $document->loadHTML('<?xml encoding="UTF-8"><html><body>' . $html . '</body></html>', LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING);
+        $attributes = (new \DOMXPath($document))->query('//img/@src | //a/@href | //video/@src | //video/@poster | //audio/@src | //source/@src | //iframe/@src');
+        $urls = [];
+        foreach ($attributes as $attribute) { $urls[] = $attribute->value; }
+        return $urls;
     }
 
     private function find(string $sum): ?IFile
