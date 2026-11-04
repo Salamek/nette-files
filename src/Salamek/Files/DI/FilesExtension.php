@@ -28,7 +28,11 @@ class FilesExtension extends CompilerExtension
             'dataDir' => Expect::string()->required(),
             'webTempDir' => Expect::string()->required(),
             'iconPath' => Expect::string('assets/file/ico'),
-            'variants' => Expect::array()->default([]),
+            'variants' => Expect::arrayOf(Expect::structure([
+                'width' => Expect::anyOf(Expect::int()->min(1)->max(4096), Expect::null())->default(null),
+                'height' => Expect::anyOf(Expect::int()->min(1)->max(4096), Expect::null())->default(null),
+                'resizeMode' => Expect::anyOf('fit', 'fill', 'exact', 'shrink_only', 'stretch', 'crop', 'fit_exact')->default('fit'),
+            ])->castTo('array'), 'string')->default([]),
             'publicMaxAge' => Expect::int(3600)->min(0),
             'accelMapping' => Expect::arrayOf('string')->default([]),
             'iconDir' => Expect::string()->required()

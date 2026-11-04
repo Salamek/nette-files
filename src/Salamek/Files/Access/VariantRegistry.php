@@ -4,18 +4,30 @@ namespace Salamek\Files\Access;
 /** Fixed recipes prevent arbitrary image dimensions/transformations through HTTP. */
 final class VariantRegistry
 {
-    private array $variants;
+    private const MODES = ['fit', 'fill', 'exact', 'shrink_only', 'stretch', 'crop', 'fit_exact'];
+    private array $variants = [];
 
     public function __construct(array $variants = [])
     {
-        $this->variants = $variants;
         foreach ($variants as $name => $recipe) {
-            if (!preg_match('/^[a-zA-Z0-9_-]{1,80}$/D', $name) || in_array($name, ['original', 'download'], true)
-                || count($recipe) !== 3 || !in_array($recipe[2], [null, 'fit', 'fill', 'exact', 'shrink_only', 'stretch', 'crop', 'fit_exact'], true)
-                || ($recipe[0] === null && $recipe[1] === null)) { throw new \InvalidArgumentException('Invalid file variant: ' . $name); }
-            foreach (array_slice($recipe, 0, 2) as $dimension) {
-                if ($dimension !== null && (!is_int($dimension) || $dimension < 1 || $dimension > 4096)) { throw new \InvalidArgumentException('Invalid image dimension.'); }
+            if (!is_string($name) || !preg_match('/^[a-zA-Z0-9_-]{1,80}$/D', $name)
+                || in_array($name, ['original', 'download'], true) || !is_array($recipe)
+                || array_diff(array_keys($recipe), ['width', 'height', 'resizeMode']) !== []) {
+                throw new \InvalidArgumentException('Invalid file variant: ' . $name);
             }
+            $width = $recipe['width'] ?? null;
+            $height = $recipe['height'] ?? null;
+            $mode = array_key_exists('resizeMode', $recipe) ? $recipe['resizeMode'] : 'fit';
+            if (($width === null && $height === null) || !in_array($mode, self::MODES, true)) {
+                throw new \InvalidArgumentException('Invalid file variant: ' . $name);
+            }
+            foreach ([$width, $height] as $dimension) {
+                if ($dimension !== null && (!is_int($dimension) || $dimension < 1 || $dimension > 4096)) {
+                    throw new \InvalidArgumentException('Invalid image dimension.');
+                }
+            }
+            // Keep the internal rendering recipe/cache key stable for unchanged definitions.
+            $this->variants[$name] = [$width, $height, $mode === 'fit' ? null : $mode];
         }
     }
 
@@ -26,7 +38,7 @@ final class VariantRegistry
     {
         if ($size === null && $flags === null) { return 'original'; }
         if (!preg_match('/^(\d*)x(\d*)$/D', (string) $size, $match)) { throw new \InvalidArgumentException('Invalid image size.'); }
-        $recipe = [$match[1] !== '' ? (int) $match[1] : null, $match[2] !== '' ? (int) $match[2] : null, $flags];
+        $recipe = [$match[1] !== '' ? (int) $match[1] : null, $match[2] !== '' ? (int) $match[2] : null, $flags === 'fit' ? null : $flags];
         foreach ($this->variants as $name => $candidate) { if ($candidate === $recipe) { return $name; } }
         throw new \InvalidArgumentException('Image recipe is not registered: ' . $size . ' ' . $flags);
     }

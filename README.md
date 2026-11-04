@@ -40,7 +40,9 @@ allowed variant before reading either the original or a generated image. Existin
 MD5 records remain readable; new uploads use SHA-256. Checksums identify content,
 not permissions. URLs do not expire and contain no access signatures.
 
-Register fixed image recipes in the extension:
+Each package declares its own fixed image recipes under `files.variants` in its
+configuration; Nette merges these maps. Project-specific variants belong in the
+project configuration. Use named fields (`width`, `height`, `resizeMode`):
 
 ```neon
 files:
@@ -50,8 +52,15 @@ files:
     iconPath: assets/file/ico
     publicMaxAge: 3600
     variants:
-        thumbnail: [304, 247, exact]
+        thumbnail:
+            width: 304
+            height: 247
+            resizeMode: exact
 ```
+
+Omitting a dimension leaves it unconstrained; at least one dimension is required.
+`resizeMode` defaults to `fit`. Supported modes are `fit`, `fill`, `exact`,
+`shrink_only`, `stretch`, `crop`, and `fit_exact`.
 
 `ImagePipe::request($reference, '304x247', 'exact')` finds that registered recipe and
 returns its URL. It performs no disk reads or transformations while rendering a
